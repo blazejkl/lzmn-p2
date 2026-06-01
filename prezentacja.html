@@ -6,7 +6,7 @@
 <title>Gauss-Seidel — klasyczny i blokowy 2×2</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 
 <style>
@@ -54,16 +54,16 @@
 
   /* header block */
   .kicker{
-    font-size:.84rem;letter-spacing:.24em;text-transform:uppercase;
+    font-size:.95rem;letter-spacing:.24em;text-transform:uppercase;
     color:var(--accent);font-weight:700;margin-bottom:.85rem;
     display:flex;align-items:center;gap:.7rem;
   }
   .kicker::before{content:"";width:30px;height:2px;background:var(--accent);display:inline-block;border-radius:2px}
-  h1{font-size:3.1rem;line-height:1.1;font-weight:800;letter-spacing:-.015em}
-  h2{font-size:2.35rem;line-height:1.12;font-weight:800;letter-spacing:-.015em;margin-bottom:.3rem}
-  h3{font-size:1.22rem;font-weight:700;color:#fff;margin-bottom:.7rem;letter-spacing:-.01em}
-  p{color:var(--muted);font-size:1.16rem;line-height:1.62}
-  .lead{font-size:1.34rem;color:#dbe7f2;line-height:1.5}
+  h1{font-size:3.3rem;line-height:1.1;font-weight:800;letter-spacing:-.015em}
+  h2{font-size:2.65rem;line-height:1.12;font-weight:800;letter-spacing:-.015em;margin-bottom:.3rem}
+  h3{font-size:1.42rem;font-weight:700;color:#fff;margin-bottom:.7rem;letter-spacing:-.01em}
+  p{color:var(--muted);font-size:1.3rem;line-height:1.6}
+  .lead{font-size:1.5rem;color:#dbe7f2;line-height:1.48}
   strong{color:#fff;font-weight:700}
 
   /* body fills remaining height and centers vertically */
@@ -85,8 +85,8 @@
     display:flex;flex-direction:column;justify-content:center;
   }
   .card.tight{justify-content:flex-start}
-  .card p{font-size:1.08rem}
-  .card .lead{font-size:1.18rem}
+  .card p{font-size:1.22rem}
+  .card .lead{font-size:1.32rem}
   .edge{border-left:4px solid var(--accent)}
   .edge-blue{border-left:4px solid var(--blue)}
   .edge-amber{border-left:4px solid var(--amber)}
@@ -103,9 +103,9 @@
   .math{
     background:#0c1d2e;border:1px solid var(--line2);
     border-radius:14px;padding:1.4rem 1.5rem;margin:.45rem 0;
-    overflow-x:auto;font-size:1.2rem;
+    overflow-x:auto;font-size:1.38rem;
   }
-  .math.lg{font-size:1.4rem;padding:1.8rem 1.6rem}
+  .math.lg{font-size:1.6rem;padding:1.8rem 1.6rem}
   .math-accent{border-left:4px solid var(--accent)}
   .katex{color:#eef5fb}
   .mi .katex{color:#eef5fb}
@@ -113,7 +113,7 @@
   code{font-family:var(--mono);font-size:.92em;color:var(--amber);
     background:#0a1828;padding:.1em .4em;border-radius:6px}
   pre{
-    font-family:var(--mono);font-size:.95rem;line-height:1.6;
+    font-family:var(--mono);font-size:1.04rem;line-height:1.6;
     background:#091523;border:1px solid var(--line2);border-radius:14px;
     padding:1.3rem 1.4rem;overflow-x:auto;color:#d4e4f4;margin:0;
   }
@@ -122,17 +122,17 @@
   pre .kw{color:var(--blue)}
 
   ul.clean{list-style:none}
-  ul.clean li{position:relative;padding-left:1.6rem;margin:.6rem 0;color:#d3e1ef;font-size:1.12rem;line-height:1.5}
+  ul.clean li{position:relative;padding-left:1.6rem;margin:.7rem 0;color:#d3e1ef;font-size:1.24rem;line-height:1.5}
   ul.clean li::before{content:"";position:absolute;left:0;top:.55em;width:8px;height:8px;border-radius:2px;background:var(--accent);transform:rotate(45deg)}
 
   /* table */
-  table{border-collapse:collapse;width:100%;font-size:1.02rem}
-  th,td{padding:.72rem .8rem;text-align:left;border-bottom:1px solid var(--line2)}
-  th{color:var(--amber);font-weight:700;font-size:.84rem;letter-spacing:.06em;text-transform:uppercase}
+  table{border-collapse:collapse;width:100%;font-size:1.12rem}
+  th,td{padding:.78rem .85rem;text-align:left;border-bottom:1px solid var(--line2)}
+  th{color:var(--amber);font-weight:700;font-size:.92rem;letter-spacing:.06em;text-transform:uppercase}
   td{color:#dce8f3}
   tbody tr.block-row{background:rgba(255,178,58,.05)}
   tbody tr:hover{background:rgba(72,167,255,.08)}
-  .num{font-family:var(--mono);font-size:.96rem}
+  .num{font-family:var(--mono);font-size:1.04rem}
   .ok{color:var(--green);font-weight:700}
   .bad{color:var(--red);font-weight:700}
 
@@ -169,7 +169,7 @@
   .stat .v{font-family:var(--mono);font-size:2rem;font-weight:700;color:#fff;line-height:1.1}
   .stat .l{font-size:.92rem;color:var(--soft);margin-top:.35rem}
 
-  .note{color:var(--soft);font-size:1.04rem;margin-top:1.1rem;line-height:1.55}
+  .note{color:var(--soft);font-size:1.16rem;margin-top:1.1rem;line-height:1.55}
 
   /* chrome */
   .topbar{position:fixed;top:0;left:0;right:0;height:4px;background:#091523;z-index:50}
@@ -732,13 +732,25 @@ function runLive(){
 
 /* ===== KaTeX ===== */
 function renderMath(root){
+  if(!window.katex)return false;
   root.querySelectorAll('.math,.mi').forEach(el=>{
     if(el.dataset.rendered)return;
     try{katex.render(el.dataset.tex||el.textContent,el,{displayMode:el.classList.contains('math'),throwOnError:false});el.dataset.rendered=1;}catch(e){}
   });
+  return true;
 }
-function boot(){renderMath(document.body);show(0);}
-if(window.katex)boot(); else window.addEventListener('load',boot);
+// Pokaż slajdy od razu; matematykę renderuj gdy tylko KaTeX będzie gotowy
+// (odporne na opóźnione/przestawione ładowanie skryptów przez proxy typu htmlpreview).
+function start(){
+  show(0);
+  let tries=0;
+  (function tick(){
+    if(renderMath(document.body))return;
+    if(tries++<100)setTimeout(tick,80);
+  })();
+}
+if(document.readyState!=='loading')start();
+else document.addEventListener('DOMContentLoaded',start);
 </script>
 </body>
 </html>
