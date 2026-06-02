@@ -169,27 +169,26 @@
   }
 
   /* ---------- WYDRUK / EKSPORT PDF (Ctrl/Cmd+P → Zapisz jako PDF) ---------- */
+  /* Stały rozmiar strony 16:9 = jeden slajd = jedna strona, nadmiar przycięty. */
   @media print{
-    @page{ size:A4 landscape; margin:0; }
+    @page{ size:1600px 900px; margin:0; }
     html,body{height:auto;overflow:visible;background:#0b1726;
       -webkit-print-color-adjust:exact;print-color-adjust:exact;}
     .topbar,.footer,.hint{display:none!important}
-    .deck{position:static;width:auto;height:auto}
+    .deck{position:static;width:1600px;height:auto}
     .slide{
       position:relative!important;inset:auto!important;
       display:flex!important;opacity:1!important;transform:none!important;
-      width:100%;height:100vh;
-      padding:6vh 5vw;
-      page-break-after:always;break-after:page;
+      width:1600px;height:900px;overflow:hidden;
+      padding:60px 80px;
+      page-break-after:always;break-after:page;page-break-inside:avoid;
       background:linear-gradient(135deg,#11243b 0%,#0b1726 70%);
       -webkit-print-color-adjust:exact;print-color-adjust:exact;
     }
     .slide:last-child{page-break-after:auto;break-after:auto}
-    .card,.math,.svgwrap svg,.chartwrap{
-      -webkit-print-color-adjust:exact;print-color-adjust:exact;
-      box-shadow:none!important;
-    }
-    .chartwrap{min-height:48vh}
+    .body{margin-top:22px}
+    .card,.math{box-shadow:none!important;
+      -webkit-print-color-adjust:exact;print-color-adjust:exact;}
   }
 </style>
 </head>
