@@ -5,8 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gauss-Seidel — klasyczny i blokowy 2×2</title>
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<!-- Tylko Chart.js (wykresy). Matematyka: natywny MathML, bez żadnych bibliotek. -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
 <style>
@@ -52,7 +51,6 @@
   }
   .slide.active{display:flex;opacity:1;transform:none}
 
-  /* header block */
   .kicker{
     font-size:.95rem;letter-spacing:.24em;text-transform:uppercase;
     color:var(--accent);font-weight:700;margin-bottom:.85rem;
@@ -66,7 +64,6 @@
   .lead{font-size:1.5rem;color:#dbe7f2;line-height:1.48}
   strong{color:#fff;font-weight:700}
 
-  /* body fills remaining height and centers vertically */
   .body{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;margin-top:1.6rem}
 
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:1.7rem;align-items:stretch}
@@ -74,7 +71,6 @@
   .grid2.wide-right{grid-template-columns:.82fr 1.18fr}
   .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;align-items:stretch}
   .col{display:flex;flex-direction:column;gap:1.3rem}
-  .stack{display:flex;flex-direction:column;gap:1.1rem;justify-content:center}
 
   .card{
     background:linear-gradient(180deg,var(--panel),var(--panel2));
@@ -99,16 +95,19 @@
     color:var(--soft);background:#0c1d2e;margin-bottom:.5rem;
   }
 
-  /* math */
+  /* ---------- MathML ---------- */
+  math{
+    font-family:'Latin Modern Math','STIX Two Math','Cambria Math','Times New Roman',serif;
+    font-size:1.14em;line-height:normal;
+  }
   .math{
     background:#0c1d2e;border:1px solid var(--line2);
-    border-radius:14px;padding:1.4rem 1.5rem;margin:.45rem 0;
-    overflow-x:auto;font-size:1.38rem;
+    border-radius:14px;padding:1.3rem 1.5rem;margin:.5rem 0;
+    overflow-x:auto;text-align:center;
   }
-  .math.lg{font-size:1.6rem;padding:1.8rem 1.6rem}
+  .math math{font-size:1.55rem;color:#eef5fb}
+  .math.lg math{font-size:1.8rem}
   .math-accent{border-left:4px solid var(--accent)}
-  .katex{color:#eef5fb}
-  .mi .katex{color:#eef5fb}
 
   code{font-family:var(--mono);font-size:.92em;color:var(--amber);
     background:#0a1828;padding:.1em .4em;border-radius:6px}
@@ -118,60 +117,35 @@
     padding:1.3rem 1.4rem;overflow-x:auto;color:#d4e4f4;margin:0;
   }
   pre .cm{color:#62788d}
-  pre .fn{color:var(--amber)}
   pre .kw{color:var(--blue)}
 
   ul.clean{list-style:none}
   ul.clean li{position:relative;padding-left:1.6rem;margin:.7rem 0;color:#d3e1ef;font-size:1.24rem;line-height:1.5}
   ul.clean li::before{content:"";position:absolute;left:0;top:.55em;width:8px;height:8px;border-radius:2px;background:var(--accent);transform:rotate(45deg)}
 
-  /* table */
   table{border-collapse:collapse;width:100%;font-size:1.12rem}
-  th,td{padding:.78rem .85rem;text-align:left;border-bottom:1px solid var(--line2)}
-  th{color:var(--amber);font-weight:700;font-size:.92rem;letter-spacing:.06em;text-transform:uppercase}
+  th,td{padding:.72rem .85rem;text-align:left;border-bottom:1px solid var(--line2)}
+  th{color:var(--amber);font-weight:700;font-size:.9rem;letter-spacing:.05em;text-transform:uppercase}
   td{color:#dce8f3}
-  tbody tr.block-row{background:rgba(255,178,58,.05)}
   tbody tr:hover{background:rgba(72,167,255,.08)}
-  .num{font-family:var(--mono);font-size:1.04rem}
+  .num{font-family:var(--mono);font-size:1.02rem}
   .ok{color:var(--green);font-weight:700}
   .bad{color:var(--red);font-weight:700}
 
-  /* title slide */
   #s-title{justify-content:center}
   .toprow{display:flex;gap:.8rem;margin-bottom:1.8rem}
   .badge{font-size:.92rem;color:var(--soft);border:1px solid var(--line);padding:.45rem .9rem;border-radius:9px;background:rgba(12,29,46,.5)}
   .authors{display:flex;gap:2.2rem;margin-top:2.4rem;font-size:1.25rem;color:#dbe7f2}
   .authors b{color:#fff}
-  .prowadzaca{margin-top:2.6rem;color:var(--soft);font-size:1.08rem}
 
-  /* charts */
   .chartcard{display:flex;flex-direction:column;min-height:0}
   .chartcard h3{flex:0 0 auto}
   .chartwrap{position:relative;flex:1;min-height:0;width:100%}
 
-  /* interactive */
-  .controls{display:flex;flex-wrap:wrap;gap:1.6rem;align-items:flex-end;margin-bottom:1.2rem}
-  .ctl{display:flex;flex-direction:column;gap:.45rem;min-width:180px}
-  .ctl label{font-size:.82rem;color:var(--soft);letter-spacing:.04em;text-transform:uppercase;font-weight:600}
-  input[type=range]{width:100%;accent-color:var(--accent);height:6px}
-  .readout{font-family:var(--mono);font-size:1.7rem;font-weight:700;color:#fff;line-height:1}
-  .btn{
-    background:var(--accent);color:#fff;border:none;border-radius:11px;
-    padding:.8rem 1.5rem;font-weight:700;font-size:1.02rem;cursor:pointer;
-    transition:filter .15s ease,transform .1s ease;
-  }
-  .btn:hover{filter:brightness(1.12)}
-  .btn:active{transform:translateY(1px)}
-  .verdict{font-size:1.15rem;font-weight:700;padding:.55rem 1rem;border-radius:10px;display:inline-block;line-height:1}
-  .verdict.good{background:rgba(61,218,160,.14);color:var(--green);border:1px solid rgba(61,218,160,.4)}
-  .verdict.warn{background:rgba(255,178,58,.14);color:var(--amber);border:1px solid rgba(255,178,58,.4)}
-  .verdict.bad{background:rgba(255,97,112,.14);color:var(--red);border:1px solid rgba(255,97,112,.4)}
   .stat .v{font-family:var(--mono);font-size:2rem;font-weight:700;color:#fff;line-height:1.1}
   .stat .l{font-size:.92rem;color:var(--soft);margin-top:.35rem}
-
   .note{color:var(--soft);font-size:1.16rem;margin-top:1.1rem;line-height:1.55}
 
-  /* chrome */
   .topbar{position:fixed;top:0;left:0;right:0;height:4px;background:#091523;z-index:50}
   .progress{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--amber));transition:width .4s ease}
   .footer{
@@ -227,10 +201,10 @@
         <div class="card edge-blue">
           <h3>Po co?</h3>
           <p>Metoda Gaussa–Seidela to <strong>iteracyjny algorytm</strong> rozwiązywania układów
-          <span class="mi" data-tex="Ax=b"></span>. Zamiast jednorazowej, kosztownej dla dużych
-          <span class="mi" data-tex="n"></span> faktoryzacji, buduje ciąg przybliżeń
-          <span class="mi" data-tex="x^{(0)},x^{(1)},\dots"></span> zbiegający do rozwiązania.
-          Kluczowa dla macierzy rzadkich i wielkoskalowych.</p>
+          <math><mi>A</mi><mi>x</mi><mo>=</mo><mi>b</mi></math>. Zamiast jednorazowej, kosztownej dla dużych
+          <math><mi>n</mi></math> faktoryzacji, buduje ciąg przybliżeń
+          <math><msup><mi>x</mi><mrow><mo>(</mo><mn>0</mn><mo>)</mo></mrow></msup><mo>,</mo><msup><mi>x</mi><mrow><mo>(</mo><mn>1</mn><mo>)</mo></mrow></msup><mo>,</mo><mo>…</mo></math>
+          zbiegający do rozwiązania. Kluczowa dla macierzy rzadkich i wielkoskalowych.</p>
         </div>
         <div class="card">
           <h3>Trochę historii</h3>
@@ -244,12 +218,12 @@
           <h3>Cel projektu</h3>
           <p>Zaimplementować i <strong>porównać</strong> klasyczną metodę Gaussa–Seidela z metodą
           <strong>blokową 2×2</strong> dla układu o szczególnej strukturze
-          <span class="mi" data-tex="A=\left[\begin{smallmatrix}C&S\\-S&C\end{smallmatrix}\right]"></span>,
+          <math><mi>A</mi><mo>=</mo><mrow><mo>[</mo><mtable><mtr><mtd><mi>C</mi></mtd><mtd><mi>S</mi></mtd></mtr><mtr><mtd><mo>−</mo><mi>S</mi></mtd><mtd><mi>C</mi></mtd></mtr></mtable><mo>]</mo></mrow></math>,
           oraz pokazać, jak struktura macierzy decyduje o zbieżności, dokładności i czasie.</p>
         </div>
         <div class="card edge-green">
           <h3>Dlaczego ten układ jest ciekawy?</h3>
-          <p>Macierz <span class="mi" data-tex="A"></span> rozpada się na <strong>niezależne bloki 2×2</strong>
+          <p>Macierz <math><mi>A</mi></math> rozpada się na <strong>niezależne bloki 2×2</strong>
           będące macierzami obrotu. Daje to czysty poligon do porównania „naiwnego” podejścia
           współrzędnościowego z podejściem, które <strong>wykorzystuje strukturę</strong> zadania.</p>
         </div>
@@ -260,26 +234,65 @@
   <!-- 3 — PROBLEM -->
   <section class="slide" id="s-problem">
     <div class="kicker">Temat i treść zadania</div>
-    <h2>Rozwiązujemy <span class="mi" data-tex="Ax=b"></span> o strukturze obrotowej</h2>
+    <h2>Rozwiązujemy <math><mi>A</mi><mi>x</mi><mo>=</mo><mi>b</mi></math> o strukturze obrotowej</h2>
     <div class="body">
       <div class="grid2 wide-left" style="height:100%">
         <div class="card">
-          <p class="lead" style="margin-bottom:1rem">Macierz <span class="mi" data-tex="A\in\mathbb{R}^{n\times n},\; n=2p"></span> ma postać blokową, w której bloki diagonalne spełniają warunek obrotu:</p>
-          <div class="math lg math-accent" data-tex="A=\begin{pmatrix}C & S\\ -S & C\end{pmatrix},\qquad C=\operatorname{diag}(c_1,\dots,c_p),\; S=\operatorname{diag}(s_1,\dots,s_p)"></div>
-          <div class="math lg" data-tex="\det C\neq 0,\qquad c_i^2+s_i^2=1\quad (i=1,\dots,p)"></div>
-          <p style="margin-top:1rem">Warunek <span class="mi" data-tex="c_i^2+s_i^2=1"></span> oznacza, że każdy blok jest
-          <strong>macierzą obrotu</strong>: <span class="mi" data-tex="c_i=\cos\theta_i,\; s_i=\sin\theta_i"></span>.</p>
+          <p class="lead" style="margin-bottom:1rem">Macierz
+          <math><mi>A</mi><mo>∈</mo><msup><mi>ℝ</mi><mrow><mi>n</mi><mo>×</mo><mi>n</mi></mrow></msup><mo>,</mo><mspace width="0.4em"/><mi>n</mi><mo>=</mo><mn>2</mn><mi>p</mi></math>
+          ma postać blokową, w której bloki diagonalne spełniają warunek obrotu:</p>
+          <div class="math lg math-accent">
+            <math display="block">
+              <mi>A</mi><mo>=</mo>
+              <mrow><mo>[</mo><mtable>
+                <mtr><mtd><mi>C</mi></mtd><mtd><mi>S</mi></mtd></mtr>
+                <mtr><mtd><mo>−</mo><mi>S</mi></mtd><mtd><mi>C</mi></mtd></mtr>
+              </mtable><mo>]</mo></mrow>
+              <mo>,</mo><mspace width="1.4em"/>
+              <mi>C</mi><mo>=</mo><mi>diag</mi><mo>(</mo><msub><mi>c</mi><mn>1</mn></msub><mo>,</mo><mo>…</mo><mo>,</mo><msub><mi>c</mi><mi>p</mi></msub><mo>)</mo>
+              <mo>,</mo><mspace width="0.8em"/>
+              <mi>S</mi><mo>=</mo><mi>diag</mi><mo>(</mo><msub><mi>s</mi><mn>1</mn></msub><mo>,</mo><mo>…</mo><mo>,</mo><msub><mi>s</mi><mi>p</mi></msub><mo>)</mo>
+            </math>
+          </div>
+          <div class="math lg">
+            <math display="block">
+              <mi>det</mi><mspace width="0.15em"/><mi>C</mi><mo>≠</mo><mn>0</mn>
+              <mo>,</mo><mspace width="1.4em"/>
+              <msubsup><mi>c</mi><mi>i</mi><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>s</mi><mi>i</mi><mn>2</mn></msubsup><mo>=</mo><mn>1</mn>
+              <mspace width="0.8em"/><mo>(</mo><mi>i</mi><mo>=</mo><mn>1</mn><mo>,</mo><mo>…</mo><mo>,</mo><mi>p</mi><mo>)</mo>
+            </math>
+          </div>
+          <p style="margin-top:1rem">Warunek
+          <math><msubsup><mi>c</mi><mi>i</mi><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>s</mi><mi>i</mi><mn>2</mn></msubsup><mo>=</mo><mn>1</mn></math>
+          oznacza, że każdy blok jest <strong>macierzą obrotu</strong>:
+          <math><msub><mi>c</mi><mi>i</mi></msub><mo>=</mo><mi>cos</mi><mspace width="0.12em"/><msub><mi>θ</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.4em"/><msub><mi>s</mi><mi>i</mi></msub><mo>=</mo><mi>sin</mi><mspace width="0.12em"/><msub><mi>θ</mi><mi>i</mi></msub></math>.</p>
         </div>
         <div class="col">
           <div class="card edge">
             <h3>Rozbicie na podukłady 2×2</h3>
-            <p style="margin-bottom:.6rem">Po podziale <span class="mi" data-tex="x=\binom{u}{v},\; b=\binom{f}{g}"></span> diagonalna struktura sprawia, że układ rozpada się na <strong><span class="mi" data-tex="p"></span> niezależnych zadań</strong>:</p>
-            <div class="math" data-tex="\begin{pmatrix}c_i & s_i\\ -s_i & c_i\end{pmatrix}\begin{pmatrix}u_i\\ v_i\end{pmatrix}=\begin{pmatrix}f_i\\ g_i\end{pmatrix}"></div>
+            <p style="margin-bottom:.6rem">Po podziale
+            <math><mi>x</mi><mo>=</mo><mrow><mo>(</mo><mtable><mtr><mtd><mi>u</mi></mtd></mtr><mtr><mtd><mi>v</mi></mtd></mtr></mtable><mo>)</mo></mrow><mo>,</mo><mspace width="0.4em"/><mi>b</mi><mo>=</mo><mrow><mo>(</mo><mtable><mtr><mtd><mi>f</mi></mtd></mtr><mtr><mtd><mi>g</mi></mtd></mtr></mtable><mo>)</mo></mrow></math>
+            układ rozpada się na <strong><math><mi>p</mi></math> niezależnych zadań</strong>:</p>
+            <div class="math">
+              <math display="block">
+                <mrow><mo>(</mo><mtable>
+                  <mtr><mtd><msub><mi>c</mi><mi>i</mi></msub></mtd><mtd><msub><mi>s</mi><mi>i</mi></msub></mtd></mtr>
+                  <mtr><mtd><mo>−</mo><msub><mi>s</mi><mi>i</mi></msub></mtd><mtd><msub><mi>c</mi><mi>i</mi></msub></mtd></mtr>
+                </mtable><mo>)</mo></mrow>
+                <mrow><mo>(</mo><mtable><mtr><mtd><msub><mi>u</mi><mi>i</mi></msub></mtd></mtr><mtr><mtd><msub><mi>v</mi><mi>i</mi></msub></mtd></mtr></mtable><mo>)</mo></mrow>
+                <mo>=</mo>
+                <mrow><mo>(</mo><mtable><mtr><mtd><msub><mi>f</mi><mi>i</mi></msub></mtd></mtr><mtr><mtd><msub><mi>g</mi><mi>i</mi></msub></mtd></mtr></mtable><mo>)</mo></mrow>
+              </math>
+            </div>
           </div>
           <div class="card edge-amber">
             <h3>Rozwiązanie dokładne</h3>
-            <p style="margin-bottom:.6rem">Ponieważ <span class="mi" data-tex="B_i^{-1}=\left[\begin{smallmatrix}c_i&-s_i\\ s_i&c_i\end{smallmatrix}\right]"></span>, otrzymujemy wprost wzór, który jest naszym wzorcem odniesienia:</p>
-            <div class="math" data-tex="u=Cf-Sg,\qquad v=Sf+Cg"></div>
+            <p style="margin-bottom:.6rem">Ponieważ
+            <math><msubsup><mi>B</mi><mi>i</mi><mrow><mo>−</mo><mn>1</mn></mrow></msubsup><mo>=</mo><mrow><mo>[</mo><mtable><mtr><mtd><msub><mi>c</mi><mi>i</mi></msub></mtd><mtd><mo>−</mo><msub><mi>s</mi><mi>i</mi></msub></mtd></mtr><mtr><mtd><msub><mi>s</mi><mi>i</mi></msub></mtd><mtd><msub><mi>c</mi><mi>i</mi></msub></mtd></mtr></mtable><mo>]</mo></mrow></math>,
+            otrzymujemy wprost wzór odniesienia:</p>
+            <div class="math">
+              <math display="block"><mi>u</mi><mo>=</mo><mi>C</mi><mi>f</mi><mo>−</mo><mi>S</mi><mi>g</mi><mo>,</mo><mspace width="1.2em"/><mi>v</mi><mo>=</mo><mi>S</mi><mi>f</mi><mo>+</mo><mi>C</mi><mi>g</mi></math>
+            </div>
           </div>
         </div>
       </div>
@@ -293,27 +306,55 @@
     <div class="body">
       <div class="grid2" style="height:100%">
         <div class="card">
-          <p style="margin-bottom:.6rem">Rozkładamy <span class="mi" data-tex="A=D+L+U"></span> (diagonala, część dolna i górna). Iteracja wykorzystuje <strong>natychmiast</strong> nowo policzone współrzędne:</p>
-          <div class="math" data-tex="(D+L)\,x^{(k+1)}=b-U\,x^{(k)}"></div>
-          <div class="math" data-tex="x_i^{(k+1)}=\frac{1}{a_{ii}}\Bigl(b_i-\sum_{j<i}a_{ij}x_j^{(k+1)}-\sum_{j>i}a_{ij}x_j^{(k)}\Bigr)"></div>
+          <p style="margin-bottom:.6rem">Rozkładamy
+          <math><mi>A</mi><mo>=</mo><mi>D</mi><mo>+</mo><mi>L</mi><mo>+</mo><mi>U</mi></math>
+          (diagonala, część dolna i górna). Iteracja wykorzystuje <strong>natychmiast</strong> nowo policzone współrzędne:</p>
+          <div class="math">
+            <math display="block"><mo>(</mo><mi>D</mi><mo>+</mo><mi>L</mi><mo>)</mo><msup><mi>x</mi><mrow><mo>(</mo><mi>k</mi><mo>+</mo><mn>1</mn><mo>)</mo></mrow></msup><mo>=</mo><mi>b</mi><mo>−</mo><mi>U</mi><msup><mi>x</mi><mrow><mo>(</mo><mi>k</mi><mo>)</mo></mrow></msup></math>
+          </div>
+          <div class="math">
+            <math display="block">
+              <msubsup><mi>x</mi><mi>i</mi><mrow><mo>(</mo><mi>k</mi><mo>+</mo><mn>1</mn><mo>)</mo></mrow></msubsup><mo>=</mo>
+              <mfrac><mn>1</mn><msub><mi>a</mi><mrow><mi>i</mi><mi>i</mi></mrow></msub></mfrac>
+              <mrow><mo>(</mo><msub><mi>b</mi><mi>i</mi></msub>
+                <mo>−</mo><munder><mo>∑</mo><mrow><mi>j</mi><mo>&lt;</mo><mi>i</mi></mrow></munder><msub><mi>a</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><msubsup><mi>x</mi><mi>j</mi><mrow><mo>(</mo><mi>k</mi><mo>+</mo><mn>1</mn><mo>)</mo></mrow></msubsup>
+                <mo>−</mo><munder><mo>∑</mo><mrow><mi>j</mi><mo>&gt;</mo><mi>i</mi></mrow></munder><msub><mi>a</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><msubsup><mi>x</mi><mi>j</mi><mrow><mo>(</mo><mi>k</mi><mo>)</mo></mrow></msubsup>
+              <mo>)</mo></mrow>
+            </math>
+          </div>
           <p style="margin:.8rem 0 .5rem">Dla naszego układu daje to wektorowe wzory iteracyjne:</p>
-          <div class="math math-accent" data-tex="u^{(k+1)}=\frac{f-s\circ v^{(k)}}{c},\qquad v^{(k+1)}=\frac{g+s\circ u^{(k+1)}}{c}"></div>
+          <div class="math math-accent">
+            <math display="block">
+              <msup><mi>u</mi><mrow><mo>(</mo><mi>k</mi><mo>+</mo><mn>1</mn><mo>)</mo></mrow></msup><mo>=</mo>
+              <mfrac><mrow><mi>f</mi><mo>−</mo><mi>s</mi><mo>∘</mo><msup><mi>v</mi><mrow><mo>(</mo><mi>k</mi><mo>)</mo></mrow></msup></mrow><mi>c</mi></mfrac>
+              <mo>,</mo><mspace width="1.2em"/>
+              <msup><mi>v</mi><mrow><mo>(</mo><mi>k</mi><mo>+</mo><mn>1</mn><mo>)</mo></mrow></msup><mo>=</mo>
+              <mfrac><mrow><mi>g</mi><mo>+</mo><mi>s</mi><mo>∘</mo><msup><mi>u</mi><mrow><mo>(</mo><mi>k</mi><mo>+</mo><mn>1</mn><mo>)</mo></mrow></msup></mrow><mi>c</mi></mfrac>
+            </math>
+          </div>
         </div>
         <div class="col">
           <div class="card edge-blue">
-            <h3>Parametr zbieżności <span class="mi" data-tex="\rho"></span></h3>
-            <div class="math" data-tex="\rho=\max_i\left|\frac{s_i}{c_i}\right|^2=\max_i\tan^2\theta_i"></div>
+            <h3>Parametr zbieżności <math><mi>ρ</mi></math></h3>
+            <div class="math">
+              <math display="block">
+                <mi>ρ</mi><mo>=</mo><munder><mi>max</mi><mi>i</mi></munder>
+                <msup><mrow><mo>|</mo><mfrac><msub><mi>s</mi><mi>i</mi></msub><msub><mi>c</mi><mi>i</mi></msub></mfrac><mo>|</mo></mrow><mn>2</mn></msup>
+                <mo>=</mo><munder><mi>max</mi><mi>i</mi></munder><msup><mi>tan</mi><mn>2</mn></msup><msub><mi>θ</mi><mi>i</mi></msub>
+              </math>
+            </div>
             <ul class="clean" style="margin-top:.4rem">
-              <li><span class="mi" data-tex="\rho<1"></span> &nbsp;→&nbsp; metoda zbieżna</li>
-              <li><span class="mi" data-tex="\rho\to 1"></span> &nbsp;→&nbsp; zbieżność coraz wolniejsza</li>
-              <li><span class="mi" data-tex="\rho>1"></span> &nbsp;→&nbsp; metoda <strong>rozbieżna</strong></li>
+              <li><math><mi>ρ</mi><mo>&lt;</mo><mn>1</mn></math> &nbsp;→&nbsp; metoda zbieżna</li>
+              <li><math><mi>ρ</mi><mo>→</mo><mn>1</mn></math> &nbsp;→&nbsp; zbieżność coraz wolniejsza</li>
+              <li><math><mi>ρ</mi><mo>&gt;</mo><mn>1</mn></math> &nbsp;→&nbsp; metoda <strong>rozbieżna</strong></li>
             </ul>
           </div>
           <div class="card edge-red">
             <h3>Słaby punkt</h3>
-            <p>We wzorach występuje <strong>dzielenie przez <span class="mi" data-tex="c_i"></span></strong>.
-            Gdy <span class="mi" data-tex="c_i\to 0"></span> (kąt bliski <span class="mi" data-tex="\pi/2"></span>),
-            pojawia się katastrofalna utrata dokładności — nawet jeśli macierz jest formalnie odwracalna.</p>
+            <p>We wzorach występuje <strong>dzielenie przez <math><msub><mi>c</mi><mi>i</mi></msub></math></strong>.
+            Gdy <math><msub><mi>c</mi><mi>i</mi></msub><mo>→</mo><mn>0</mn></math> (kąt bliski
+            <math><mi>π</mi><mo>/</mo><mn>2</mn></math>), pojawia się katastrofalna utrata dokładności —
+            nawet jeśli macierz jest formalnie odwracalna.</p>
           </div>
         </div>
       </div>
@@ -327,24 +368,33 @@
     <div class="body">
       <div class="grid2 wide-left" style="height:100%">
         <div class="card">
-          <p class="lead" style="margin-bottom:.8rem">Zamiast pojedynczych współrzędnych aktualizujemy <strong>całe pary</strong> <span class="mi" data-tex="(u_i,v_i)"></span> — naturalne bloki macierzy.</p>
-          <p style="margin-bottom:.5rem">Dla każdego <span class="mi" data-tex="i"></span> rozwiązujemy blok 2×2 <strong>dokładnie</strong>, korzystając z <span class="mi" data-tex="c_i^2+s_i^2=1"></span>:</p>
-          <div class="math lg math-accent" data-tex="u_i=c_i f_i - s_i g_i,\qquad v_i=s_i f_i + c_i g_i"></div>
-          <p style="margin-top:.9rem">Bloki są niezależne, więc <strong>jedno przejście</strong> daje rozwiązanie dokładne z dokładnością do błędów zaokrągleń (<span class="mi" data-tex="\sim 10^{-16}"></span>).</p>
+          <p class="lead" style="margin-bottom:.8rem">Zamiast pojedynczych współrzędnych aktualizujemy <strong>całe pary</strong>
+          <math><mo>(</mo><msub><mi>u</mi><mi>i</mi></msub><mo>,</mo><msub><mi>v</mi><mi>i</mi></msub><mo>)</mo></math> — naturalne bloki macierzy.</p>
+          <p style="margin-bottom:.5rem">Dla każdego <math><mi>i</mi></math> rozwiązujemy blok 2×2 <strong>dokładnie</strong>, korzystając z
+          <math><msubsup><mi>c</mi><mi>i</mi><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>s</mi><mi>i</mi><mn>2</mn></msubsup><mo>=</mo><mn>1</mn></math>:</p>
+          <div class="math lg math-accent">
+            <math display="block">
+              <msub><mi>u</mi><mi>i</mi></msub><mo>=</mo><msub><mi>c</mi><mi>i</mi></msub><msub><mi>f</mi><mi>i</mi></msub><mo>−</mo><msub><mi>s</mi><mi>i</mi></msub><msub><mi>g</mi><mi>i</mi></msub>
+              <mo>,</mo><mspace width="1.2em"/>
+              <msub><mi>v</mi><mi>i</mi></msub><mo>=</mo><msub><mi>s</mi><mi>i</mi></msub><msub><mi>f</mi><mi>i</mi></msub><mo>+</mo><msub><mi>c</mi><mi>i</mi></msub><msub><mi>g</mi><mi>i</mi></msub>
+            </math>
+          </div>
+          <p style="margin-top:.9rem">Bloki są niezależne, więc <strong>jedno przejście</strong> daje rozwiązanie dokładne z dokładnością do błędów zaokrągleń
+          (<math><mo>∼</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>16</mn></mrow></msup></math>).</p>
         </div>
         <div class="col">
           <div class="card edge-green" style="text-align:center">
             <div class="stat">
               <span class="v" style="color:var(--green);font-size:3.4rem">1</span>
-              <span class="l" style="font-size:1.05rem">iteracja — niezależnie od <span class="mi" data-tex="\rho"></span> i wymiaru układu</span>
+              <span class="l" style="font-size:1.05rem">iteracja — niezależnie od <math><mi>ρ</mi></math> i wymiaru układu</span>
             </div>
           </div>
           <div class="card">
             <h3>Dlaczego działa zawsze?</h3>
             <ul class="clean">
-              <li>Blok obrotu jest <strong>ortogonalny</strong> — idealnie uwarunkowany (<span class="mi" data-tex="\kappa=1"></span>)</li>
-              <li>Brak dzielenia przez małe <span class="mi" data-tex="c_i"></span> — mnożymy przez <span class="mi" data-tex="B_i^{-1}"></span></li>
-              <li>Odporna na <span class="mi" data-tex="\rho>1"></span> i na prawie osobliwe <span class="mi" data-tex="C"></span></li>
+              <li>Blok obrotu jest <strong>ortogonalny</strong> — idealnie uwarunkowany (<math><mi>κ</mi><mo>=</mo><mn>1</mn></math>)</li>
+              <li>Brak dzielenia przez małe <math><msub><mi>c</mi><mi>i</mi></msub></math> — mnożymy przez <math><msubsup><mi>B</mi><mi>i</mi><mrow><mo>−</mo><mn>1</mn></mrow></msubsup></math></li>
+              <li>Odporna na <math><mi>ρ</mi><mo>&gt;</mo><mn>1</mn></math> i na prawie osobliwe <math><mi>C</mi></math></li>
             </ul>
           </div>
         </div>
@@ -364,11 +414,11 @@
             <table>
               <tbody>
                 <tr><td><code>main_tests.m</code></td><td>skrypt sterujący: pętla testów, tabela, wykresy</td></tr>
-                <tr><td><code>generateProblem.m</code></td><td>generuje <span class="mi" data-tex="C,S,A,b,x_{exact},\rho"></span></td></tr>
+                <tr><td><code>generateProblem.m</code></td><td>generuje <math><mi>C</mi><mo>,</mo><mi>S</mi><mo>,</mo><mi>A</mi><mo>,</mo><mi>b</mi><mo>,</mo><msub><mi>x</mi><mi>exact</mi></msub><mo>,</mo><mi>ρ</mi></math></td></tr>
                 <tr><td><code>gaussSeidelClassic.m</code></td><td>klasyczna iteracja + diagnostyka</td></tr>
                 <tr><td><code>gaussSeidelBlock2x2.m</code></td><td>rozwiązanie blokowe 2×2</td></tr>
                 <tr><td><code>computeMetrics.m</code></td><td>błędy, residuum, czas → tabela</td></tr>
-                <tr><td><code>plotResults.m</code></td><td>pięć wykresów porównawczych</td></tr>
+                <tr><td><code>plotResults.m</code></td><td>wykresy porównawcze</td></tr>
               </tbody>
             </table>
           </div>
@@ -376,7 +426,7 @@
             <h3>Zabezpieczenia numeryczne</h3>
             <ul class="clean">
               <li>Kontrola <code>c_i ≈ 0</code> → czytelny błąd zamiast NaN</li>
-              <li>Detekcja rozbieżności: <span class="mi" data-tex="\|r\|>10^{12}"></span> → zatrzymanie</li>
+              <li>Detekcja rozbieżności: <math><mo>‖</mo><mi>r</mi><mo>‖</mo><mo>&gt;</mo><msup><mn>10</mn><mn>12</mn></msup></math> → zatrzymanie</li>
               <li>Podwójne kryterium stopu: residuum oraz wielkość kroku</li>
             </ul>
           </div>
@@ -410,7 +460,9 @@ x = [u; v];   <span class="cm">% gotowe w jednym przejściu</span></pre>
     <div class="kicker">Eksperymenty numeryczne</div>
     <h2>Dwanaście przypadków — od łatwego do patologicznego</h2>
     <div class="body">
-      <p class="lead" style="margin-bottom:1rem">W każdym teście losujemy <span class="mi" data-tex="x_{exact}"></span>, liczymy <span class="mi" data-tex="b=Ax_{exact}"></span> i porównujemy z dokładnym rozwiązaniem oraz z <code>A\b</code> z MATLAB-a.</p>
+      <p class="lead" style="margin-bottom:1rem">W każdym teście losujemy
+      <math><msub><mi>x</mi><mi>exact</mi></msub></math>, liczymy
+      <math><mi>b</mi><mo>=</mo><mi>A</mi><msub><mi>x</mi><mi>exact</mi></msub></math> i porównujemy z dokładnym rozwiązaniem oraz z <code>A\b</code> z MATLAB-a.</p>
       <div class="card" style="overflow:auto">
         <table>
           <thead>
@@ -439,37 +491,39 @@ x = [u; v];   <span class="cm">% gotowe w jednym przejściu</span></pre>
           <tbody id="resultsBody"></tbody>
         </table>
       </div>
-      <p class="note">Klasyczny GS: od <strong>1</strong> do <strong>894</strong> iteracji zależnie od <span class="mi" data-tex="\rho"></span>; dla <span class="mi" data-tex="\rho\ge1"></span> nie zbiega (błąd rzędu <span class="mi" data-tex="10^{12}"></span> lub stagnacja). Blokowy: zawsze 1 iteracja, błąd <span class="mi" data-tex="\sim10^{-16}"></span>. <span style="color:var(--amber)">*</span> wartości teoretyczne — do zastąpienia wynikami z MATLAB.</p>
+      <p class="note">Klasyczny GS: od <strong>1</strong> do <strong>894</strong> iteracji dla przypadków zbieżnych; dla
+      <math><mi>ρ</mi><mo>=</mo><mn>1</mn></math> nie zbiega (10000 iteracji, błąd <math><mo>∼</mo><mn>1</mn></math>), a dla
+      <math><mi>ρ</mi><mo>&gt;</mo><mn>1</mn></math> rozbieżność (błąd rzędu <math><msup><mn>10</mn><mn>12</mn></msup></math>). Blokowy: zawsze 1 iteracja, błąd <math><mo>∼</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>16</mn></mrow></msup></math>.</p>
     </div>
   </section>
 
-  <!-- 10 — ZBIEŻNOŚĆ -->
+  <!-- 9 — ZBIEŻNOŚĆ -->
   <section class="slide" id="s-conv">
     <div class="kicker">Analiza · zbieżność</div>
-    <h2>Historia residuum i wpływ <span class="mi" data-tex="\rho"></span> na liczbę iteracji</h2>
+    <h2>Historia residuum i wpływ <math><mi>ρ</mi></math> na liczbę iteracji</h2>
     <div class="body">
       <div class="grid2" style="flex:1;min-height:0">
         <div class="card chartcard"><h3>Spadek residuum klasycznego GS (skala log)</h3><div class="chartwrap"><canvas id="residualChart"></canvas></div></div>
         <div class="card chartcard"><h3>Liczba iteracji w funkcji ρ</h3><div class="chartwrap"><canvas id="iterChart"></canvas></div></div>
       </div>
-      <p class="note">Im bliżej <span class="mi" data-tex="\rho=1"></span>, tym wolniejszy (geometryczny) spadek residuum — test 4 wymaga <strong>894</strong> iteracji, podczas gdy testy 1–3 mieszczą się poniżej 30.</p>
+      <p class="note">Im bliżej <math><mi>ρ</mi><mo>=</mo><mn>1</mn></math>, tym wolniejszy (geometryczny) spadek residuum — test 4 wymaga <strong>894</strong> iteracji, podczas gdy testy zbieżne 1–3, 7, 8, 11 mieszczą się poniżej 30.</p>
     </div>
   </section>
 
-  <!-- 11 — BŁĄD + CZAS -->
+  <!-- 10 — BŁĄD + CZAS -->
   <section class="slide" id="s-errtime">
     <div class="kicker">Analiza · dokładność i koszt</div>
     <h2>Błąd rozwiązania i czas wykonania</h2>
     <div class="body">
       <div class="grid2" style="flex:1;min-height:0">
         <div class="card chartcard"><h3>Względny błąd rozwiązania (skala log)</h3><div class="chartwrap"><canvas id="errChart"></canvas></div></div>
-        <div class="card chartcard"><h3>Czas wykonania [ms]</h3><div class="chartwrap"><canvas id="timeChart"></canvas></div></div>
+        <div class="card chartcard"><h3>Czas wykonania [ms] (skala log)</h3><div class="chartwrap"><canvas id="timeChart"></canvas></div></div>
       </div>
-      <p class="note">Blokowy GS utrzymuje błąd <span class="mi" data-tex="\sim10^{-16}"></span> <strong>we wszystkich</strong> testach i jest też szybszy — pojedyncze operacje wektorowe zamiast setek iteracji.</p>
+      <p class="note">Blokowy GS utrzymuje błąd <math><mo>∼</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>16</mn></mrow></msup></math> <strong>we wszystkich</strong> 12 testach i jest też szybszy — pojedyncze operacje wektorowe zamiast setek/tysięcy iteracji (skrajnie: test 9 — 10000 iteracji klasycznego GS).</p>
     </div>
   </section>
 
-  <!-- 12 — WNIOSKI -->
+  <!-- 11 — WNIOSKI -->
   <section class="slide" id="s-concl">
     <div class="kicker">Wnioski</div>
     <h2>Co pokazały eksperymenty</h2>
@@ -479,10 +533,10 @@ x = [u; v];   <span class="cm">% gotowe w jednym przejściu</span></pre>
           <div class="card edge-blue">
             <h3>Klasyczny GS</h3>
             <ul class="clean">
-              <li>Silnie zależny od <span class="mi" data-tex="\rho=\max_i\tan^2\theta_i"></span></li>
-              <li><span class="mi" data-tex="\rho\to1"></span>: poprawny, lecz praktycznie bezużyteczny (894 iteracje)</li>
-              <li><span class="mi" data-tex="\rho>1"></span>: rozbieżny — błąd <span class="mi" data-tex="\sim10^{12}"></span></li>
-              <li>Małe <span class="mi" data-tex="c_i"></span>: dzielenie przez ~0 → niestabilność</li>
+              <li>Silnie zależny od <math><mi>ρ</mi><mo>=</mo><munder><mi>max</mi><mi>i</mi></munder><msup><mi>tan</mi><mn>2</mn></msup><msub><mi>θ</mi><mi>i</mi></msub></math></li>
+              <li><math><mi>ρ</mi><mo>→</mo><mn>1</mn></math>: poprawny, lecz praktycznie bezużyteczny (894 iteracje)</li>
+              <li><math><mi>ρ</mi><mo>≥</mo><mn>1</mn></math>: brak zbieżności — stagnacja lub błąd <math><mo>∼</mo><msup><mn>10</mn><mn>12</mn></msup></math></li>
+              <li>Małe <math><msub><mi>c</mi><mi>i</mi></msub></math>: dzielenie przez ~0 → niestabilność</li>
             </ul>
           </div>
           <div class="card edge-amber">
@@ -490,20 +544,20 @@ x = [u; v];   <span class="cm">% gotowe w jednym przejściu</span></pre>
             <ul class="clean">
               <li>Stabilny we wszystkich dwunastu testach</li>
               <li>Jedna iteracja, błąd na poziomie zaokrągleń maszynowych</li>
-              <li>Niewrażliwy na <span class="mi" data-tex="\rho"></span> i na osobliwość <span class="mi" data-tex="C"></span></li>
+              <li>Niewrażliwy na <math><mi>ρ</mi></math> i na osobliwość <math><mi>C</mi></math></li>
             </ul>
           </div>
         </div>
         <div class="card edge" style="justify-content:center">
           <div class="kicker" style="margin-bottom:1.2rem">Najważniejszy morał</div>
           <h2 style="font-size:1.95rem;color:#fff;line-height:1.2;margin-bottom:1.2rem">W metodach numerycznych liczy się nie tylko <span style="color:var(--amber)">wybór algorytmu</span>, ale przede wszystkim <span style="color:var(--blue)">wykorzystanie struktury macierzy</span>.</h2>
-          <p>Ten sam problem: jedno podejście potrzebuje setek iteracji i bywa rozbieżne, drugie rozwiązuje go dokładnie w jednym kroku — bo „rozumie” geometrię obrotów ukrytą w <span class="mi" data-tex="A"></span>.</p>
+          <p>Ten sam problem: jedno podejście potrzebuje setek lub tysięcy iteracji i bywa rozbieżne, drugie rozwiązuje go dokładnie w jednym kroku — bo „rozumie” geometrię obrotów ukrytą w <math><mi>A</mi></math>.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- 13 — KONIEC -->
+  <!-- 12 — KONIEC -->
   <section class="slide" id="s-end" style="justify-content:center;text-align:center">
     <div class="kicker" style="justify-content:center">Dziękujemy za uwagę</div>
     <h1 style="font-size:3.6rem">Pytania?</h1>
@@ -517,34 +571,32 @@ x = [u; v];   <span class="cm">% gotowe w jednym przejściu</span></pre>
   <div>Gauss–Seidel · klasyczny vs blokowy 2×2</div>
   <div class="nav">
     <button class="navbtn" id="prevBtn" aria-label="Poprzedni">‹</button>
-    <span class="counter"><span id="cur">1</span> / <span id="total">13</span></span>
+    <span class="counter"><span id="cur">1</span> / <span id="total">12</span></span>
     <button class="navbtn" id="nextBtn" aria-label="Następny">›</button>
   </div>
 </div>
 <div class="hint">← → nawigacja · F pełny ekran</div>
 
 <script>
-/* ===== DANE TESTÓW I WYNIKÓW =====
-   Testy 1–6: zmierzone (results_table.csv). Testy 7–12: wartości teoretyczne
-   z modelu zbieżności (czynnik błędu = max tan²θ), do zastąpienia realnym CSV.
-   Pola: id,p,n,rho, cc=klas.zbieżny, ci/cr/ce/ct=klas. iter/res/err/time,
-   bi/br/be/bt=blok iter/res/err/time, char=charakter, cel, est=estymata */
+/* ===== REALNE DANE 12 TESTÓW (results_table.csv, MATLAB) =====
+   id,p,n,rho, cc=klas.zbieżny, ci=klas.iter, ce=klas.błąd wzgl., ct=klas.czas[ms],
+   bi=blok iter, be=blok błąd wzgl., bt=blok czas[ms], char, cel */
 const TESTS = [
-  {id:1,p:3,n:6,rho:0.0410914,cc:true,ci:8,cr:2.343e-11,ce:1.085e-11,ct:6.586,bi:1,br:3.511e-16,be:1.625e-16,bt:1.049,char:'łatwy',cel:'poprawność i szybka zbieżność dla małego wymiaru'},
-  {id:2,p:50,n:100,rho:0.4301887,cc:true,ci:27,cr:4.938e-10,ce:4.507e-11,ct:0.173,bi:1,br:1.362e-15,be:1.243e-16,bt:0.020,char:'zbieżny',cel:'losowe θ∈[0.05,0.6], typowy przypadek zbieżny'},
-  {id:3,p:1000,n:2000,rho:0.2977693,cc:true,ci:18,cr:2.482e-9,ce:5.582e-11,ct:0.231,bi:1,br:4.616e-15,be:1.038e-16,bt:0.022,char:'zbieżny',cel:'duży wymiar, skalowanie i czas działania'},
-  {id:4,p:50,n:100,rho:0.9786384,cc:true,ci:894,cr:9.820e-10,ce:9.819e-11,ct:1.747,bi:1,br:7.964e-16,be:7.963e-17,bt:0.012,char:'graniczny',cel:'ρ≈0.98, drastyczne spowolnienie klasycznej metody'},
-  {id:5,p:20,n:40,rho:2.4255188,cc:false,ci:34,cr:1.209e13,ce:1.669e12,ct:0.111,bi:1,br:5.133e-16,be:7.086e-17,bt:0.013,char:'rozbieżny',cel:'ρ≈2.43>1, klasyczny GS zawodzi'},
-  {id:6,p:20,n:40,rho:1.0e16,cc:false,ci:1,cr:4.292e16,ce:6.452e15,ct:0.049,bi:1,br:1.080e-15,be:1.623e-16,bt:0.011,char:'niestabilny',cel:'cᵢ→0, prawie osobliwe C, niestabilność numeryczna'},
-  {id:7,p:2,n:4,rho:0.0956894,cc:true,ci:10,cr:5.0e-11,ce:3.0e-11,ct:0.005,bi:1,br:2.0e-16,be:1.5e-16,bt:0.004,char:'łatwy',cel:'minimalny wymiar p=2, dwa bloki, szybka zbieżność',est:true},
-  {id:8,p:100,n:200,rho:0.1787539,cc:true,ci:14,cr:3.0e-10,ce:3.0e-11,ct:0.06,bi:1,br:1.4e-15,be:1.2e-16,bt:0.02,char:'zbieżny',cel:'jednorodne θ=0.40, stabilna zbieżność',est:true},
-  {id:9,p:30,n:60,rho:1.0,cc:false,ci:10000,cr:1.5e1,ce:9.0e-1,ct:3.5,bi:1,br:8.0e-16,be:9.0e-17,bt:0.012,char:'graniczny ρ=1',cel:'θ=π/4 dokładnie, ρ=1, brak zbieżności (oscylacja)',est:true},
-  {id:10,p:40,n:80,rho:1.588,cc:false,ci:60,cr:9.0e12,ce:1.0e12,ct:0.12,bi:1,br:6.0e-16,be:8.0e-17,bt:0.013,char:'rozbieżny',cel:'mieszane θ wokół π/4, max ρ>1, rozbieżność',est:true},
-  {id:11,p:2000,n:4000,rho:0.2954,cc:true,ci:19,cr:3.0e-9,ce:6.0e-11,ct:0.5,bi:1,br:6.0e-15,be:1.1e-16,bt:0.04,char:'zbieżny',cel:'bardzo duży wymiar, skalowanie czasu i pamięci',est:true},
-  {id:12,p:20,n:40,rho:1.1485,cc:false,ci:200,cr:6.0e12,ce:1.0e12,ct:0.25,bi:1,br:5.0e-16,be:8.0e-17,bt:0.013,char:'wolno rozbieżny',cel:'θ tuż powyżej π/4, powolna rozbieżność (kontrast do testu 4)',est:true},
+  {id:1,p:3,n:6,rho:0.0410914,cc:true,ci:8,ce:1.0847e-11,ct:8.219,bi:1,be:1.625e-16,bt:1.183,char:'łatwy',cel:'poprawność i szybka zbieżność dla małego wymiaru'},
+  {id:2,p:50,n:100,rho:0.4301887,cc:true,ci:27,ce:4.507e-11,ct:1.482,bi:1,be:1.240e-16,bt:0.147,char:'zbieżny',cel:'losowe θ∈[0.05,0.6], typowy przypadek zbieżny'},
+  {id:3,p:1000,n:2000,rho:0.2977693,cc:true,ci:18,ce:5.582e-11,ct:0.447,bi:1,be:1.115e-16,bt:0.122,char:'zbieżny',cel:'duży wymiar, skalowanie i czas działania'},
+  {id:4,p:50,n:100,rho:0.9786384,cc:true,ci:894,ce:9.819e-11,ct:1.635,bi:1,be:9.907e-17,bt:0.119,char:'graniczny',cel:'ρ≈0.98, drastyczne spowolnienie klasycznej metody'},
+  {id:5,p:20,n:40,rho:2.4255188,cc:false,ci:34,ce:1.669e12,ct:2.135,bi:1,be:8.107e-17,bt:1.015,char:'rozbieżny',cel:'ρ≈2.43>1, klasyczny GS zawodzi'},
+  {id:6,p:20,n:40,rho:1.0e16,cc:false,ci:1,ce:6.452e15,ct:0.075,bi:1,be:1.623e-16,bt:0.014,char:'niestabilny',cel:'cᵢ→0, prawie osobliwe C, niestabilność numeryczna'},
+  {id:7,p:2,n:4,rho:0.0956889,cc:true,ci:11,ce:1.000e-11,ct:0.231,bi:1,be:1.154e-16,bt:0.013,char:'łatwy',cel:'minimalny wymiar p=2, dwa bloki, szybka zbieżność'},
+  {id:8,p:100,n:200,rho:0.1787541,cc:true,ci:14,ce:6.568e-11,ct:0.112,bi:1,be:1.058e-16,bt:0.013,char:'zbieżny',cel:'jednorodne θ=0.40, stabilna zbieżność'},
+  {id:9,p:30,n:60,rho:1.0,cc:false,ci:10000,ce:1.095,ct:25.577,bi:1,be:1.149e-16,bt:0.021,char:'graniczny ρ=1',cel:'θ=π/4 dokładnie, ρ=1, brak zbieżności (oscylacja, 10000 iter.)'},
+  {id:10,p:40,n:80,rho:1.588,cc:false,ci:62,ce:1.422e12,ct:0.323,bi:1,be:1.242e-16,bt:0.019,char:'rozbieżny',cel:'mieszane θ wokół π/4, max ρ>1, rozbieżność'},
+  {id:11,p:2000,n:4000,rho:0.2974017,cc:true,ci:18,ce:5.814e-11,ct:0.511,bi:1,be:1.162e-16,bt:0.068,char:'zbieżny',cel:'bardzo duży wymiar, skalowanie czasu i pamięci'},
+  {id:12,p:20,n:40,rho:1.1485703,cc:false,ci:217,ce:1.085e12,ct:0.619,bi:1,be:9.760e-17,bt:0.018,char:'wolno rozbieżny',cel:'θ tuż powyżej π/4, powolna rozbieżność (kontrast do testu 4)'},
 ];
 
-/* ===== GAUSS-SEIDEL W JS (żywa symulacja) ===== */
+/* ===== GAUSS-SEIDEL W JS (do żywych historii residuum) ===== */
 function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
 function buildProblem(p,thetaMax,seed){
   const rng=mulberry32(seed||12345);const c=[],s=[];
@@ -552,8 +604,7 @@ function buildProblem(p,thetaMax,seed){
   const xe=[];for(let i=0;i<2*p;i++)xe[i]=rng()*2-1;
   const u=xe.slice(0,p),v=xe.slice(p);const f=[],g=[];
   for(let i=0;i<p;i++){f[i]=c[i]*u[i]+s[i]*v[i];g[i]=-s[i]*u[i]+c[i]*v[i];}
-  let rho=0;for(let i=0;i<p;i++){const t=(s[i]/c[i])**2;if(t>rho)rho=t;}
-  return {p,c,s,f,g,xe,rho};
+  return {p,c,s,f,g,xe};
 }
 function vnorm(a){let t=0;for(const x of a)t+=x*x;return Math.sqrt(t);}
 function classicGS(P,tol=1e-10,maxIter=2000){
@@ -567,8 +618,7 @@ function classicGS(P,tol=1e-10,maxIter=2000){
     if(!isFinite(r)||r>1e12){conv=false;break;}
     if(r/bNorm<tol){conv=true;break;}
   }
-  const x=u.concat(v);let de=0;for(let i=0;i<2*p;i++)de+=(x[i]-P.xe[i])**2;
-  return {hist,iters,conv,relErr:Math.sqrt(de)/Math.max(vnorm(P.xe),1)};
+  return {hist,iters,conv};
 }
 
 /* ===== NAWIGACJA ===== */
@@ -582,7 +632,6 @@ function show(n){
   document.getElementById('cur').textContent=idx+1;
   document.getElementById('progress').style.width=((idx+1)/total*100)+'%';
   initSlide(slides[idx].id);
-  renderMath(slides[idx]);
 }
 const next=()=>show(idx+1), prev=()=>show(idx-1);
 document.getElementById('nextBtn').onclick=next;
@@ -598,46 +647,37 @@ document.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-tx
 
 /* ===== WYKRESY ===== */
 const C_CLASSIC='#48a7ff', C_BLOCK='#ffb23a', GRID='rgba(255,255,255,.08)', TICK='#a9bccf';
+const haveChart=typeof Chart!=='undefined';
 const baseOpts=(logY)=>({responsive:true,maintainAspectRatio:false,
   plugins:{legend:{labels:{color:'#eef5fb',font:{size:14}}}},
   scales:{x:{ticks:{color:TICK},grid:{color:GRID}},
     y:{type:logY?'logarithmic':'linear',ticks:{color:TICK},grid:{color:GRID}}}});
+const fmt=x=>(x>=1e-3&&x<1e5)?x.toLocaleString('pl',{maximumSignificantDigits:4}):x.toExponential(2).replace('e','·10^').replace('+','');
 
 function initSlide(id){
   if(initDone[id])return;
   if(id==='s-tests'){buildTestsTable();initDone[id]=true;}
   if(id==='s-table'){buildTable();initDone[id]=true;}
-  if(id==='s-conv'){buildResidualChart();buildIterChart();initDone[id]=true;}
-  if(id==='s-errtime'){buildErrChart();buildTimeChart();initDone[id]=true;}
-}
-const fmt=x=>(x>=1e-3&&x<1e5)?x.toLocaleString('pl',{maximumSignificantDigits:4}):x.toExponential(2).replace('e','·10^').replace('+','');
-function charClass(c){
-  if(/rozbie|niestabil/.test(c))return 'edge-red';
-  if(/granic/.test(c))return 'edge-amber';
-  return '';
+  if(id==='s-conv'&&haveChart){buildResidualChart();buildIterChart();initDone[id]=true;}
+  if(id==='s-errtime'&&haveChart){buildErrChart();buildTimeChart();initDone[id]=true;}
 }
 function buildTestsTable(){
-  const body=document.getElementById('testsBody');
-  body.innerHTML=TESTS.map(t=>{
-    const star=t.est?'<span style="color:var(--amber)">*</span>':'';
+  document.getElementById('testsBody').innerHTML=TESTS.map(t=>{
     const col=/rozbie|niestabil|ρ=1/.test(t.char)?'var(--red)':(/granic/.test(t.char)?'var(--amber)':'var(--green)');
-    return `<tr><td>${t.id}${star}</td><td class="num">${t.p}</td><td class="num">${t.n}</td>
+    return `<tr><td>${t.id}</td><td class="num">${t.p}</td><td class="num">${t.n}</td>
       <td class="num">${fmt(t.rho)}</td><td style="color:${col};font-weight:700">${t.char}</td><td>${t.cel}</td></tr>`;
   }).join('');
 }
 function buildTable(){
-  const body=document.getElementById('resultsBody');
-  body.innerHTML=TESTS.map(t=>{
-    const star=t.est?'<span style="color:var(--amber)">*</span>':'';
+  document.getElementById('resultsBody').innerHTML=TESTS.map(t=>{
     const conv=t.cc?'<span class="ok">tak</span>':'<span class="bad">nie</span>';
     const citer=t.cc?t.ci:(t.ci>=10000?t.ci+' (maxIter)':t.ci);
-    return `<tr><td>${t.id}${star}</td><td class="num">${t.n}</td><td class="num">${fmt(t.rho)}</td>
+    return `<tr><td>${t.id}</td><td class="num">${t.n}</td><td class="num">${fmt(t.rho)}</td>
       <td>${conv}</td><td class="num">${citer}</td><td class="num">${fmt(t.ce)}</td>
       <td class="num">${t.bi}</td><td class="num">${fmt(t.be)}</td></tr>`;
   }).join('');
 }
 function buildResidualChart(){
-  // reprezentatywne historie residuum klasycznego GS (żywa symulacja)
   const cfgs=[{p:50,th:0.60,seed:2,label:'ρ≈0.43 — szybka zbieżność',color:C_CLASSIC},
               {p:50,th:0.78,seed:4,label:'ρ≈0.98 — wolna zbieżność',color:C_BLOCK},
               {p:20,th:0.82,seed:12,label:'ρ≈1.15 — rozbieżność',color:'#ff6170'}];
@@ -673,27 +713,9 @@ function buildTimeChart(){
     {label:'Blokowy GS 2×2',data:TESTS.map(t=>t.bt),backgroundColor:C_BLOCK}]},options:o});
 }
 
-/* ===== KaTeX ===== */
-function renderMath(root){
-  if(!window.katex)return false;
-  root.querySelectorAll('.math,.mi').forEach(el=>{
-    if(el.dataset.rendered)return;
-    try{katex.render(el.dataset.tex||el.textContent,el,{displayMode:el.classList.contains('math'),throwOnError:false});el.dataset.rendered=1;}catch(e){}
-  });
-  return true;
-}
-// Pokaż slajdy od razu; matematykę renderuj gdy tylko KaTeX będzie gotowy
-// (odporne na opóźnione/przestawione ładowanie skryptów przez proxy typu htmlpreview).
-function start(){
-  show(0);
-  let tries=0;
-  (function tick(){
-    if(renderMath(document.body))return;
-    if(tries++<100)setTimeout(tick,80);
-  })();
-}
-if(document.readyState!=='loading')start();
-else document.addEventListener('DOMContentLoaded',start);
+/* ===== START ===== */
+if(document.readyState!=='loading')show(0);
+else document.addEventListener('DOMContentLoaded',()=>show(0));
 </script>
 </body>
 </html>
