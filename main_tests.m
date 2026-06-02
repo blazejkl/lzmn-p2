@@ -7,7 +7,7 @@ close all;
 
 tol = 1e-10;
 maxIter = 10000;
-testIDs = 1:6;
+testIDs = 1:12;
 
 metricsList = struct([]);
 histories = struct([]);

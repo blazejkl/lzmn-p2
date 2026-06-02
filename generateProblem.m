@@ -51,8 +51,44 @@ switch testID
         p = 20;
         theta = (pi/2 - 1e-8) * ones(p, 1);
 
+    case 7
+        problem.testName = "Minimalny przypadek p=2";
+        problem.comment = "Najmniejszy sensowny wymiar, dwa bloki, latwa i szybka zbieznosc.";
+        p = 2;
+        theta = [0.10; 0.30];
+
+    case 8
+        problem.testName = "Sredni jednorodny zbiezny";
+        problem.comment = "Wszystkie theta rowne, jednorodny rho ponizej 1, stabilna zbieznosc.";
+        p = 100;
+        theta = 0.40 * ones(p, 1);
+
+    case 9
+        problem.testName = "Dokladnie na granicy pi/4";
+        problem.comment = "theta = pi/4, rho = 1, klasyczny GS na granicy zbieznosci.";
+        p = 30;
+        theta = (pi/4) * ones(p, 1);
+
+    case 10
+        problem.testName = "Mieszane theta wokol pi/4";
+        problem.comment = "Polowa theta mala, polowa powyzej pi/4, max rho > 1, klasyczny GS rozbiezny.";
+        p = 40;
+        theta = [0.20 * ones(p/2, 1); 0.90 * ones(p/2, 1)];
+
+    case 11
+        problem.testName = "Bardzo duzy test wydajnosciowy";
+        problem.comment = "Wymiar wiekszy niz test 3, skalowanie czasu i pamieci obu metod.";
+        p = 2000;
+        theta = 0.05 + (0.50 - 0.05) * rand(p, 1);
+
+    case 12
+        problem.testName = "Lekko powyzej granicy zbieznosci";
+        problem.comment = "theta tuz powyzej pi/4, klasyczny GS powoli rozbiezny, kontrast do testu 4.";
+        p = 20;
+        theta = linspace(0.79, 0.82, p)';
+
     otherwise
-        error('Nieznany testID. Dozwolone wartosci: 1, 2, ..., 6.');
+        error('Nieznany testID. Dozwolone wartosci: 1, 2, ..., 12.');
 end
 
 c = cos(theta);

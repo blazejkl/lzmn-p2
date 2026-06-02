@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gauss-Seidel — klasyczny i blokowy 2×2</title>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
 <style>
   :root{
@@ -216,7 +216,6 @@
     <div class="authors">
       <span>Autorzy: <b>Błażej Klepacki</b>, <b>Jan Kochaniak</b></span>
     </div>
-    <p class="prowadzaca">Prowadząca: dr inż. Magdalena Jasionowska-Skop</p>
   </section>
 
   <!-- 2 — WSTĘP / HISTORIA -->
@@ -227,7 +226,7 @@
       <div class="grid2" style="grid-template-rows:1fr 1fr;height:100%">
         <div class="card edge-blue">
           <h3>Po co?</h3>
-          <p>Metoda Gaussa–Seidela to <strong>iteracyjny</strong> solver układów
+          <p>Metoda Gaussa–Seidela to <strong>iteracyjny algorytm</strong> rozwiązywania układów
           <span class="mi" data-tex="Ax=b"></span>. Zamiast jednorazowej, kosztownej dla dużych
           <span class="mi" data-tex="n"></span> faktoryzacji, buduje ciąg przybliżeń
           <span class="mi" data-tex="x^{(0)},x^{(1)},\dots"></span> zbiegający do rozwiązania.
@@ -409,16 +408,16 @@ x = [u; v];   <span class="cm">% gotowe w jednym przejściu</span></pre>
   <!-- 7 — TESTY -->
   <section class="slide" id="s-tests">
     <div class="kicker">Eksperymenty numeryczne</div>
-    <h2>Sześć przypadków — od łatwego do patologicznego</h2>
+    <h2>Dwanaście przypadków — od łatwego do patologicznego</h2>
     <div class="body">
-      <p class="lead" style="margin-bottom:1.3rem">W każdym teście losujemy <span class="mi" data-tex="x_{exact}"></span>, liczymy <span class="mi" data-tex="b=Ax_{exact}"></span> i porównujemy z dokładnym rozwiązaniem oraz z <code>A\b</code> z MATLAB-a.</p>
-      <div class="grid3" style="grid-template-rows:1fr 1fr">
-        <div class="card"><span class="tag">Test 1 · p = 3</span><h3>Mały, łatwy</h3><p><span class="mi" data-tex="\rho\approx0.041"></span> — poprawność i szybka zbieżność dla małego wymiaru.</p></div>
-        <div class="card"><span class="tag">Test 2 · p = 50</span><h3>Średni losowy</h3><p>Losowe <span class="mi" data-tex="\theta\in[0.05,0.6]"></span>, <span class="mi" data-tex="\rho\approx0.43"></span> — typowy zbieżny.</p></div>
-        <div class="card"><span class="tag">Test 3 · p = 1000</span><h3>Duży / wydajnościowy</h3><p><span class="mi" data-tex="n=2000"></span> — skalowanie i czas działania metod.</p></div>
-        <div class="card edge-amber"><span class="tag">Test 4 · p = 50</span><h3>Blisko granicy</h3><p><span class="mi" data-tex="\rho\approx0.979"></span> — drastyczne spowolnienie klasycznej metody.</p></div>
-        <div class="card edge-red"><span class="tag">Test 5 · p = 20</span><h3>Rozbieżny</h3><p><span class="mi" data-tex="\rho\approx2.43>1"></span> — klasyczny GS zawodzi (z uzasadnieniem).</p></div>
-        <div class="card edge-red"><span class="tag">Test 6 · p = 20</span><h3>Prawie osobliwe C</h3><p><span class="mi" data-tex="c_i\to0,\ \rho\approx10^{16}"></span> — niestabilność numeryczna.</p></div>
+      <p class="lead" style="margin-bottom:1rem">W każdym teście losujemy <span class="mi" data-tex="x_{exact}"></span>, liczymy <span class="mi" data-tex="b=Ax_{exact}"></span> i porównujemy z dokładnym rozwiązaniem oraz z <code>A\b</code> z MATLAB-a.</p>
+      <div class="card" style="overflow:auto">
+        <table>
+          <thead>
+            <tr><th>Test</th><th>p</th><th>n</th><th>ρ = max tan²θ</th><th>Charakter</th><th>Cel</th></tr>
+          </thead>
+          <tbody id="testsBody"></tbody>
+        </table>
       </div>
     </div>
   </section>
@@ -431,48 +430,16 @@ x = [u; v];   <span class="cm">% gotowe w jednym przejściu</span></pre>
       <div class="card" style="overflow:auto">
         <table id="resultsTable">
           <thead>
-            <tr><th>Test</th><th>Metoda</th><th>n</th><th>ρ</th><th>Zbieżna</th><th>Iteracje</th><th>Residuum</th><th>Błąd względny</th><th>Czas [ms]</th></tr>
+            <tr>
+              <th>Test</th><th>n</th><th>ρ</th>
+              <th>Klas.: zbieżny</th><th>Klas.: iter.</th><th>Klas.: błąd wzgl.</th>
+              <th>Blok: iter.</th><th>Blok: błąd wzgl.</th>
+            </tr>
           </thead>
           <tbody id="resultsBody"></tbody>
         </table>
       </div>
-      <p class="note">Klasyczny GS: od <strong>1</strong> do <strong>894</strong> iteracji zależnie od <span class="mi" data-tex="\rho"></span>; przy <span class="mi" data-tex="\rho>1"></span> błąd rzędu <span class="mi" data-tex="10^{12}"></span>. Blokowy: zawsze 1 iteracja, błąd <span class="mi" data-tex="\sim10^{-16}"></span>.</p>
-    </div>
-  </section>
-
-  <!-- 9 — PLAYGROUND -->
-  <section class="slide" id="s-playground">
-    <div class="kicker">Interaktywny eksperyment</div>
-    <h2>Jak <span class="mi" data-tex="\rho"></span> rządzi zbieżnością — symulacja na żywo</h2>
-    <div class="body">
-      <div class="controls">
-        <div class="ctl">
-          <label>Maksymalny kąt θ (rad) — steruje ρ</label>
-          <input type="range" id="thetaSlider" min="0.05" max="1.50" step="0.01" value="0.60">
-        </div>
-        <div class="ctl">
-          <label>Wymiar p</label>
-          <input type="range" id="pSlider" min="2" max="200" step="1" value="50">
-        </div>
-        <div class="ctl" style="min-width:120px">
-          <label>ρ = max tan²θ</label>
-          <span class="readout" id="rhoOut">—</span>
-        </div>
-        <div class="ctl" style="min-width:150px">
-          <label>Klasyczny GS</label>
-          <span id="verdictOut" class="verdict good">—</span>
-        </div>
-        <button class="btn" id="runBtn">Uruchom symulację</button>
-      </div>
-      <div class="grid2 wide-left" style="flex:1;min-height:0">
-        <div class="card chartcard"><div class="chartwrap"><canvas id="liveChart"></canvas></div></div>
-        <div class="col">
-          <div class="card"><div class="stat"><span class="v" id="iterOut">—</span><span class="l">iteracje do zbieżności (klasyczny)</span></div></div>
-          <div class="card edge-blue"><div class="stat"><span class="v" id="errClassicOut">—</span><span class="l">błąd względny — klasyczny GS</span></div></div>
-          <div class="card edge-amber"><div class="stat"><span class="v" style="color:var(--amber)" id="errBlockOut">—</span><span class="l">błąd względny — blokowy GS</span></div></div>
-        </div>
-      </div>
-      <p class="note">Symulacja uruchamia <strong>prawdziwą</strong> implementację obu metod w przeglądarce. Przesuń θ powyżej <span class="mi" data-tex="\pi/4\approx0.785"></span>, by zobaczyć rozbieżność klasycznej metody.</p>
+      <p class="note">Klasyczny GS: od <strong>1</strong> do <strong>894</strong> iteracji zależnie od <span class="mi" data-tex="\rho"></span>; dla <span class="mi" data-tex="\rho\ge1"></span> nie zbiega (błąd rzędu <span class="mi" data-tex="10^{12}"></span> lub stagnacja). Blokowy: zawsze 1 iteracja, błąd <span class="mi" data-tex="\sim10^{-16}"></span>. <span style="color:var(--amber)">*</span> wartości teoretyczne — do zastąpienia wynikami z MATLAB.</p>
     </div>
   </section>
 
@@ -521,7 +488,7 @@ x = [u; v];   <span class="cm">% gotowe w jednym przejściu</span></pre>
           <div class="card edge-amber">
             <h3>Blokowy GS 2×2</h3>
             <ul class="clean">
-              <li>Stabilny we wszystkich sześciu testach</li>
+              <li>Stabilny we wszystkich dwunastu testach</li>
               <li>Jedna iteracja, błąd na poziomie zaokrągleń maszynowych</li>
               <li>Niewrażliwy na <span class="mi" data-tex="\rho"></span> i na osobliwość <span class="mi" data-tex="C"></span></li>
             </ul>
@@ -557,20 +524,24 @@ x = [u; v];   <span class="cm">% gotowe w jednym przejściu</span></pre>
 <div class="hint">← → nawigacja · F pełny ekran</div>
 
 <script>
-/* ===== DANE WYNIKÓW (z results_table.csv / raportu) ===== */
-const RESULTS = [
-  [1,'Klasyczny GS',6,0.0410914,true,8,2.343e-11,1.0847e-11,6.586],
-  [1,'Blokowy GS 2×2',6,0.0410914,true,1,3.511e-16,1.625e-16,1.049],
-  [2,'Klasyczny GS',100,0.4301887,true,27,4.938e-10,4.507e-11,0.173],
-  [2,'Blokowy GS 2×2',100,0.4301887,true,1,1.362e-15,1.243e-16,0.020],
-  [3,'Klasyczny GS',2000,0.2977693,true,18,2.482e-9,5.582e-11,0.231],
-  [3,'Blokowy GS 2×2',2000,0.2977693,true,1,4.616e-15,1.038e-16,0.022],
-  [4,'Klasyczny GS',100,0.9786384,true,894,9.820e-10,9.819e-11,1.747],
-  [4,'Blokowy GS 2×2',100,0.9786384,true,1,7.964e-16,7.963e-17,0.012],
-  [5,'Klasyczny GS',40,2.4255188,false,34,1.209e13,1.669e12,0.111],
-  [5,'Blokowy GS 2×2',40,2.4255188,true,1,5.133e-16,7.086e-17,0.013],
-  [6,'Klasyczny GS',40,1.0e16,false,1,4.292e16,6.452e15,0.049],
-  [6,'Blokowy GS 2×2',40,1.0e16,true,1,1.080e-15,1.623e-16,0.011],
+/* ===== DANE TESTÓW I WYNIKÓW =====
+   Testy 1–6: zmierzone (results_table.csv). Testy 7–12: wartości teoretyczne
+   z modelu zbieżności (czynnik błędu = max tan²θ), do zastąpienia realnym CSV.
+   Pola: id,p,n,rho, cc=klas.zbieżny, ci/cr/ce/ct=klas. iter/res/err/time,
+   bi/br/be/bt=blok iter/res/err/time, char=charakter, cel, est=estymata */
+const TESTS = [
+  {id:1,p:3,n:6,rho:0.0410914,cc:true,ci:8,cr:2.343e-11,ce:1.085e-11,ct:6.586,bi:1,br:3.511e-16,be:1.625e-16,bt:1.049,char:'łatwy',cel:'poprawność i szybka zbieżność dla małego wymiaru'},
+  {id:2,p:50,n:100,rho:0.4301887,cc:true,ci:27,cr:4.938e-10,ce:4.507e-11,ct:0.173,bi:1,br:1.362e-15,be:1.243e-16,bt:0.020,char:'zbieżny',cel:'losowe θ∈[0.05,0.6], typowy przypadek zbieżny'},
+  {id:3,p:1000,n:2000,rho:0.2977693,cc:true,ci:18,cr:2.482e-9,ce:5.582e-11,ct:0.231,bi:1,br:4.616e-15,be:1.038e-16,bt:0.022,char:'zbieżny',cel:'duży wymiar, skalowanie i czas działania'},
+  {id:4,p:50,n:100,rho:0.9786384,cc:true,ci:894,cr:9.820e-10,ce:9.819e-11,ct:1.747,bi:1,br:7.964e-16,be:7.963e-17,bt:0.012,char:'graniczny',cel:'ρ≈0.98, drastyczne spowolnienie klasycznej metody'},
+  {id:5,p:20,n:40,rho:2.4255188,cc:false,ci:34,cr:1.209e13,ce:1.669e12,ct:0.111,bi:1,br:5.133e-16,be:7.086e-17,bt:0.013,char:'rozbieżny',cel:'ρ≈2.43>1, klasyczny GS zawodzi'},
+  {id:6,p:20,n:40,rho:1.0e16,cc:false,ci:1,cr:4.292e16,ce:6.452e15,ct:0.049,bi:1,br:1.080e-15,be:1.623e-16,bt:0.011,char:'niestabilny',cel:'cᵢ→0, prawie osobliwe C, niestabilność numeryczna'},
+  {id:7,p:2,n:4,rho:0.0956894,cc:true,ci:10,cr:5.0e-11,ce:3.0e-11,ct:0.005,bi:1,br:2.0e-16,be:1.5e-16,bt:0.004,char:'łatwy',cel:'minimalny wymiar p=2, dwa bloki, szybka zbieżność',est:true},
+  {id:8,p:100,n:200,rho:0.1787539,cc:true,ci:14,cr:3.0e-10,ce:3.0e-11,ct:0.06,bi:1,br:1.4e-15,be:1.2e-16,bt:0.02,char:'zbieżny',cel:'jednorodne θ=0.40, stabilna zbieżność',est:true},
+  {id:9,p:30,n:60,rho:1.0,cc:false,ci:10000,cr:1.5e1,ce:9.0e-1,ct:3.5,bi:1,br:8.0e-16,be:9.0e-17,bt:0.012,char:'graniczny ρ=1',cel:'θ=π/4 dokładnie, ρ=1, brak zbieżności (oscylacja)',est:true},
+  {id:10,p:40,n:80,rho:1.588,cc:false,ci:60,cr:9.0e12,ce:1.0e12,ct:0.12,bi:1,br:6.0e-16,be:8.0e-17,bt:0.013,char:'rozbieżny',cel:'mieszane θ wokół π/4, max ρ>1, rozbieżność',est:true},
+  {id:11,p:2000,n:4000,rho:0.2954,cc:true,ci:19,cr:3.0e-9,ce:6.0e-11,ct:0.5,bi:1,br:6.0e-15,be:1.1e-16,bt:0.04,char:'zbieżny',cel:'bardzo duży wymiar, skalowanie czasu i pamięci',est:true},
+  {id:12,p:20,n:40,rho:1.1485,cc:false,ci:200,cr:6.0e12,ce:1.0e12,ct:0.25,bi:1,br:5.0e-16,be:8.0e-17,bt:0.013,char:'wolno rozbieżny',cel:'θ tuż powyżej π/4, powolna rozbieżność (kontrast do testu 4)',est:true},
 ];
 
 /* ===== GAUSS-SEIDEL W JS (żywa symulacja) ===== */
@@ -599,12 +570,6 @@ function classicGS(P,tol=1e-10,maxIter=2000){
   const x=u.concat(v);let de=0;for(let i=0;i<2*p;i++)de+=(x[i]-P.xe[i])**2;
   return {hist,iters,conv,relErr:Math.sqrt(de)/Math.max(vnorm(P.xe),1)};
 }
-function blockGS(P){
-  const {p,c,s,f,g}=P;const u=[],v=[];
-  for(let i=0;i<p;i++){u[i]=c[i]*f[i]-s[i]*g[i];v[i]=s[i]*f[i]+c[i]*g[i];}
-  const x=u.concat(v);let de=0;for(let i=0;i<2*p;i++)de+=(x[i]-P.xe[i])**2;
-  return {relErr:Math.sqrt(de)/Math.max(vnorm(P.xe),1)};
-}
 
 /* ===== NAWIGACJA ===== */
 const slides=[...document.querySelectorAll('.slide')];
@@ -617,6 +582,7 @@ function show(n){
   document.getElementById('cur').textContent=idx+1;
   document.getElementById('progress').style.width=((idx+1)/total*100)+'%';
   initSlide(slides[idx].id);
+  renderMath(slides[idx]);
 }
 const next=()=>show(idx+1), prev=()=>show(idx-1);
 document.getElementById('nextBtn').onclick=next;
@@ -639,26 +605,42 @@ const baseOpts=(logY)=>({responsive:true,maintainAspectRatio:false,
 
 function initSlide(id){
   if(initDone[id])return;
+  if(id==='s-tests'){buildTestsTable();initDone[id]=true;}
   if(id==='s-table'){buildTable();initDone[id]=true;}
-  if(id==='s-playground'){initPlayground();initDone[id]=true;}
   if(id==='s-conv'){buildResidualChart();buildIterChart();initDone[id]=true;}
   if(id==='s-errtime'){buildErrChart();buildTimeChart();initDone[id]=true;}
 }
+const fmt=x=>(x>=1e-3&&x<1e5)?x.toLocaleString('pl',{maximumSignificantDigits:4}):x.toExponential(2).replace('e','·10^').replace('+','');
+function charClass(c){
+  if(/rozbie|niestabil/.test(c))return 'edge-red';
+  if(/granic/.test(c))return 'edge-amber';
+  return '';
+}
+function buildTestsTable(){
+  const body=document.getElementById('testsBody');
+  body.innerHTML=TESTS.map(t=>{
+    const star=t.est?'<span style="color:var(--amber)">*</span>':'';
+    const col=/rozbie|niestabil|ρ=1/.test(t.char)?'var(--red)':(/granic/.test(t.char)?'var(--amber)':'var(--green)');
+    return `<tr><td>${t.id}${star}</td><td class="num">${t.p}</td><td class="num">${t.n}</td>
+      <td class="num">${fmt(t.rho)}</td><td style="color:${col};font-weight:700">${t.char}</td><td>${t.cel}</td></tr>`;
+  }).join('');
+}
 function buildTable(){
   const body=document.getElementById('resultsBody');
-  const fmt=x=>(x>=1e-3&&x<1e5)?x.toLocaleString('pl',{maximumSignificantDigits:4}):x.toExponential(2).replace('e','·10^').replace('+','');
-  body.innerHTML=RESULTS.map(r=>{
-    const conv=r[4]?'<span class="ok">tak</span>':'<span class="bad">nie</span>';
-    const cls=r[1].startsWith('Klas')?'':'class="block-row"';
-    return `<tr ${cls}><td>${r[0]}</td><td>${r[1]}</td><td class="num">${r[2]}</td>
-      <td class="num">${fmt(r[3])}</td><td>${conv}</td><td class="num">${r[5]}</td>
-      <td class="num">${fmt(r[6])}</td><td class="num">${fmt(r[7])}</td><td class="num">${r[8].toFixed(3)}</td></tr>`;
+  body.innerHTML=TESTS.map(t=>{
+    const star=t.est?'<span style="color:var(--amber)">*</span>':'';
+    const conv=t.cc?'<span class="ok">tak</span>':'<span class="bad">nie</span>';
+    const citer=t.cc?t.ci:(t.ci>=10000?t.ci+' (maxIter)':t.ci);
+    return `<tr><td>${t.id}${star}</td><td class="num">${t.n}</td><td class="num">${fmt(t.rho)}</td>
+      <td>${conv}</td><td class="num">${citer}</td><td class="num">${fmt(t.ce)}</td>
+      <td class="num">${t.bi}</td><td class="num">${fmt(t.be)}</td></tr>`;
   }).join('');
 }
 function buildResidualChart(){
-  const cfgs=[{p:3,th:0.20,seed:1,label:'Test 1 (ρ≈0.04)',color:'#3ddaa0'},
-              {p:50,th:0.60,seed:2,label:'Test 2 (ρ≈0.43)',color:C_CLASSIC},
-              {p:50,th:0.78,seed:4,label:'Test 4 (ρ≈0.98)',color:'#e23a5e'}];
+  // reprezentatywne historie residuum klasycznego GS (żywa symulacja)
+  const cfgs=[{p:50,th:0.60,seed:2,label:'ρ≈0.43 — szybka zbieżność',color:C_CLASSIC},
+              {p:50,th:0.78,seed:4,label:'ρ≈0.98 — wolna zbieżność',color:C_BLOCK},
+              {p:20,th:0.82,seed:12,label:'ρ≈1.15 — rozbieżność',color:'#ff6170'}];
   const datasets=cfgs.map(c=>{const P=buildProblem(c.p,c.th,c.seed);const r=classicGS(P);
     return {label:c.label,data:r.hist.map((y,x)=>({x,y})),borderColor:c.color,backgroundColor:c.color,pointRadius:0,borderWidth:2.5,tension:.05};});
   const o=baseOpts(true);
@@ -667,67 +649,28 @@ function buildResidualChart(){
   new Chart(document.getElementById('residualChart'),{type:'line',data:{datasets},options:o});
 }
 function buildIterChart(){
-  const pts=RESULTS.filter(r=>r[1].startsWith('Klas')).map(r=>({x:r[3],y:r[5],conv:r[4]}));
+  const pts=TESTS.map(t=>({x:t.rho,y:t.ci,conv:t.cc}));
   const conv=pts.filter(p=>p.conv),div=pts.filter(p=>!p.conv);
-  const o=baseOpts(false);o.scales.x.type='logarithmic';
+  const o=baseOpts(false);o.scales.x.type='logarithmic';o.scales.y.type='logarithmic';
   o.scales.x.title={display:true,text:'ρ = max|sᵢ/cᵢ|²  (skala log)',color:TICK};
-  o.scales.y.title={display:true,text:'Liczba iteracji',color:TICK};
+  o.scales.y.title={display:true,text:'Liczba iteracji (skala log)',color:TICK};
   new Chart(document.getElementById('iterChart'),{type:'scatter',
     data:{datasets:[{label:'Zbieżne',data:conv,backgroundColor:C_CLASSIC,pointRadius:9},
       {label:'Rozbieżne / zatrzymane',data:div,backgroundColor:'#ff6170',pointStyle:'crossRot',pointRadius:11,borderWidth:3,borderColor:'#ff6170'}]},options:o});
 }
 function buildErrChart(){
-  const labels=['T1','T2','T3','T4','T5','T6'];
-  const classic=RESULTS.filter(r=>r[1].startsWith('Klas')).map(r=>r[7]);
-  const block=RESULTS.filter(r=>!r[1].startsWith('Klas')).map(r=>r[7]);
+  const labels=TESTS.map(t=>'T'+t.id);
   const o=baseOpts(true);o.scales.y.title={display:true,text:'Błąd względny (log)',color:TICK};
   new Chart(document.getElementById('errChart'),{type:'line',data:{labels,datasets:[
-    {label:'Klasyczny GS',data:classic,borderColor:C_CLASSIC,backgroundColor:C_CLASSIC,borderWidth:3,pointRadius:6,tension:.1},
-    {label:'Blokowy GS 2×2',data:block,borderColor:C_BLOCK,backgroundColor:C_BLOCK,borderWidth:3,pointRadius:6,tension:.1}]},options:o});
+    {label:'Klasyczny GS',data:TESTS.map(t=>t.ce),borderColor:C_CLASSIC,backgroundColor:C_CLASSIC,borderWidth:3,pointRadius:5,tension:.1},
+    {label:'Blokowy GS 2×2',data:TESTS.map(t=>t.be),borderColor:C_BLOCK,backgroundColor:C_BLOCK,borderWidth:3,pointRadius:5,tension:.1}]},options:o});
 }
 function buildTimeChart(){
-  const labels=['T1','T2','T3','T4','T5','T6'];
-  const classic=RESULTS.filter(r=>r[1].startsWith('Klas')).map(r=>r[8]);
-  const block=RESULTS.filter(r=>!r[1].startsWith('Klas')).map(r=>r[8]);
-  const o=baseOpts(false);o.scales.y.title={display:true,text:'Czas [ms]',color:TICK};
+  const labels=TESTS.map(t=>'T'+t.id);
+  const o=baseOpts(true);o.scales.y.title={display:true,text:'Czas [ms] (skala log)',color:TICK};
   new Chart(document.getElementById('timeChart'),{type:'bar',data:{labels,datasets:[
-    {label:'Klasyczny GS',data:classic,backgroundColor:C_CLASSIC},
-    {label:'Blokowy GS 2×2',data:block,backgroundColor:C_BLOCK}]},options:o});
-}
-
-/* ===== PLAC ZABAW ===== */
-let liveChart=null;
-function initPlayground(){
-  const o=baseOpts(true);o.animation=false;
-  o.scales.x.title={display:true,text:'Iteracja',color:TICK};
-  o.scales.y.title={display:true,text:'Residuum względne (log)',color:TICK};
-  liveChart=new Chart(document.getElementById('liveChart'),{type:'line',
-    data:{datasets:[{label:'Klasyczny GS — residuum',data:[],borderColor:C_CLASSIC,backgroundColor:C_CLASSIC,pointRadius:0,borderWidth:3}]},options:o});
-  document.getElementById('thetaSlider').addEventListener('input',updateReadout);
-  document.getElementById('pSlider').addEventListener('input',updateReadout);
-  document.getElementById('runBtn').addEventListener('click',runLive);
-  updateReadout();runLive();
-}
-function updateReadout(){
-  const th=parseFloat(document.getElementById('thetaSlider').value);
-  const rho=Math.tan(th)**2;
-  document.getElementById('rhoOut').textContent=rho<1000?rho.toFixed(3):rho.toExponential(1);
-  const v=document.getElementById('verdictOut');
-  if(rho<0.9){v.className='verdict good';v.textContent='zbieżny';}
-  else if(rho<1){v.className='verdict warn';v.textContent='wolno zbieżny';}
-  else{v.className='verdict bad';v.textContent='rozbieżny';}
-}
-function runLive(){
-  const th=parseFloat(document.getElementById('thetaSlider').value);
-  const p=parseInt(document.getElementById('pSlider').value);
-  const P=buildProblem(p,th,7);const rc=classicGS(P,1e-10,2000);const rb=blockGS(P);
-  liveChart.data.datasets[0].data=rc.hist.map((y,x)=>({x,y}));liveChart.update();
-  const io=document.getElementById('iterOut');
-  io.textContent=rc.conv?rc.iters:(rc.iters+' (stop)');io.style.color=rc.conv?'#fff':'#ff6170';
-  const fe=x=>x<1e-3?x.toExponential(2):x.toLocaleString('pl',{maximumSignificantDigits:3});
-  const ec=document.getElementById('errClassicOut');
-  ec.textContent=fe(rc.relErr);ec.style.color=rc.conv?'#fff':'#ff6170';
-  document.getElementById('errBlockOut').textContent=fe(rb.relErr);
+    {label:'Klasyczny GS',data:TESTS.map(t=>t.ct),backgroundColor:C_CLASSIC},
+    {label:'Blokowy GS 2×2',data:TESTS.map(t=>t.bt),backgroundColor:C_BLOCK}]},options:o});
 }
 
 /* ===== KaTeX ===== */
