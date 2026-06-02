@@ -5,9 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gauss-Seidel — klasyczny i blokowy 2×2</title>
 
-<!-- Tylko Chart.js (wykresy). Matematyka: natywny MathML, bez żadnych bibliotek. -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-
+<!-- Brak zależności sieciowych: matematyka = MathML, wykresy = SVG generowany lokalnie. -->
 <style>
   :root{
     --bg:#0b1726;
@@ -503,8 +501,8 @@ x = [u; v];   <span class="cm">% gotowe w jednym przejściu</span></pre>
     <h2>Historia residuum i wpływ <math><mi>ρ</mi></math> na liczbę iteracji</h2>
     <div class="body">
       <div class="grid2" style="flex:1;min-height:0">
-        <div class="card chartcard"><h3>Spadek residuum klasycznego GS (skala log)</h3><div class="chartwrap"><canvas id="residualChart"></canvas></div></div>
-        <div class="card chartcard"><h3>Liczba iteracji w funkcji ρ</h3><div class="chartwrap"><canvas id="iterChart"></canvas></div></div>
+        <div class="card chartcard"><h3>Spadek residuum klasycznego GS (skala log)</h3><div class="chartwrap" id="residualChart"></div></div>
+        <div class="card chartcard"><h3>Liczba iteracji w funkcji ρ</h3><div class="chartwrap" id="iterChart"></div></div>
       </div>
       <p class="note">Im bliżej <math><mi>ρ</mi><mo>=</mo><mn>1</mn></math>, tym wolniejszy (geometryczny) spadek residuum — test 4 wymaga <strong>894</strong> iteracji, podczas gdy testy zbieżne 1–3, 7, 8, 11 mieszczą się poniżej 30.</p>
     </div>
@@ -516,8 +514,8 @@ x = [u; v];   <span class="cm">% gotowe w jednym przejściu</span></pre>
     <h2>Błąd rozwiązania i czas wykonania</h2>
     <div class="body">
       <div class="grid2" style="flex:1;min-height:0">
-        <div class="card chartcard"><h3>Względny błąd rozwiązania (skala log)</h3><div class="chartwrap"><canvas id="errChart"></canvas></div></div>
-        <div class="card chartcard"><h3>Czas wykonania [ms] (skala log)</h3><div class="chartwrap"><canvas id="timeChart"></canvas></div></div>
+        <div class="card chartcard"><h3>Względny błąd rozwiązania (skala log)</h3><div class="chartwrap" id="errChart"></div></div>
+        <div class="card chartcard"><h3>Czas wykonania [ms] (skala log)</h3><div class="chartwrap" id="timeChart"></div></div>
       </div>
       <p class="note">Blokowy GS utrzymuje błąd <math><mo>∼</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>16</mn></mrow></msup></math> <strong>we wszystkich</strong> 12 testach i jest też szybszy — pojedyncze operacje wektorowe zamiast setek/tysięcy iteracji (skrajnie: test 9 — 10000 iteracji klasycznego GS).</p>
     </div>
@@ -645,21 +643,16 @@ document.addEventListener('keydown',e=>{
 let tx=0;document.addEventListener('touchstart',e=>tx=e.touches[0].clientX,{passive:true});
 document.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)dx<0?next():prev();},{passive:true});
 
-/* ===== WYKRESY ===== */
-const C_CLASSIC='#48a7ff', C_BLOCK='#ffb23a', GRID='rgba(255,255,255,.08)', TICK='#a9bccf';
-const haveChart=typeof Chart!=='undefined';
-const baseOpts=(logY)=>({responsive:true,maintainAspectRatio:false,
-  plugins:{legend:{labels:{color:'#eef5fb',font:{size:14}}}},
-  scales:{x:{ticks:{color:TICK},grid:{color:GRID}},
-    y:{type:logY?'logarithmic':'linear',ticks:{color:TICK},grid:{color:GRID}}}});
+/* ===== TABELE ===== */
+const C_CLASSIC='#48a7ff', C_BLOCK='#ffb23a';
 const fmt=x=>(x>=1e-3&&x<1e5)?x.toLocaleString('pl',{maximumSignificantDigits:4}):x.toExponential(2).replace('e','·10^').replace('+','');
 
 function initSlide(id){
   if(initDone[id])return;
   if(id==='s-tests'){buildTestsTable();initDone[id]=true;}
   if(id==='s-table'){buildTable();initDone[id]=true;}
-  if(id==='s-conv'&&haveChart){buildResidualChart();buildIterChart();initDone[id]=true;}
-  if(id==='s-errtime'&&haveChart){buildErrChart();buildTimeChart();initDone[id]=true;}
+  if(id==='s-conv'){buildResidualChart();buildIterChart();initDone[id]=true;}
+  if(id==='s-errtime'){buildErrChart();buildTimeChart();initDone[id]=true;}
 }
 function buildTestsTable(){
   document.getElementById('testsBody').innerHTML=TESTS.map(t=>{
@@ -677,40 +670,75 @@ function buildTable(){
       <td class="num">${t.bi}</td><td class="num">${fmt(t.be)}</td></tr>`;
   }).join('');
 }
+
+/* ===== WYKRESY SVG (bez bibliotek) ===== */
+const CW=860,CH=470,ML=86,MR=28,MT=40,MB=62;
+const PX0=ML,PX1=CW-MR,PY0=CH-MB,PY1=MT;
+const AX='#3a5571', GC='rgba(255,255,255,.08)', LBL='#a9bccf';
+const xLin=(v,a,b)=>PX0+(PX1-PX0)*((v-a)/(b-a));
+const xLog=(v,lo,hi)=>PX0+(PX1-PX0)*((Math.log10(v)-lo)/(hi-lo));
+const yLog=(v,lo,hi)=>{v=Math.max(v,Math.pow(10,lo));return PY0+(PY1-PY0)*((Math.log10(v)-lo)/(hi-lo));};
+const pow=(x,y,e)=>`<text x="${x}" y="${y+4}" fill="${LBL}" font-size="13" text-anchor="end">10<tspan dy="-7" font-size="9">${e}</tspan></text>`;
+function gridYlog(lo,hi,step){let s='';for(let e=lo;e<=hi;e+=step){const y=yLog(Math.pow(10,e),lo,hi);s+=`<line x1="${PX0}" y1="${y}" x2="${PX1}" y2="${y}" stroke="${GC}"/>`+pow(PX0-10,y,e);}return s;}
+function axes(xt,yt){return `<line x1="${PX0}" y1="${PY1}" x2="${PX0}" y2="${PY0}" stroke="${AX}"/>`+
+  `<line x1="${PX0}" y1="${PY0}" x2="${PX1}" y2="${PY0}" stroke="${AX}"/>`+
+  `<text x="${(PX0+PX1)/2}" y="${CH-12}" fill="#cdd9e6" font-size="15" text-anchor="middle">${xt}</text>`+
+  `<text x="22" y="${(PY0+PY1)/2}" fill="#cdd9e6" font-size="15" text-anchor="middle" transform="rotate(-90 22 ${(PY0+PY1)/2})">${yt}</text>`;}
+function legend(items){let s=`<rect x="${PX1-260}" y="${PY1+6}" width="252" height="${items.length*24+10}" rx="8" fill="rgba(9,21,35,.78)" stroke="${AX}"/>`;
+  items.forEach((it,i)=>{const yy=PY1+20+i*24;s+=`<rect x="${PX1-248}" y="${yy-10}" width="24" height="11" rx="2" fill="${it.color}"/>`+
+    `<text x="${PX1-216}" y="${yy}" fill="#eef5fb" font-size="14">${it.label}</text>`;});return s;}
+const SVG=g=>`<svg viewBox="0 0 ${CW} ${CH}" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%;display:block">${g}</svg>`;
+
 function buildResidualChart(){
-  const cfgs=[{p:50,th:0.60,seed:2,label:'ρ≈0.43 — szybka zbieżność',color:C_CLASSIC},
-              {p:50,th:0.78,seed:4,label:'ρ≈0.98 — wolna zbieżność',color:C_BLOCK},
-              {p:20,th:0.82,seed:12,label:'ρ≈1.15 — rozbieżność',color:'#ff6170'}];
-  const datasets=cfgs.map(c=>{const P=buildProblem(c.p,c.th,c.seed);const r=classicGS(P);
-    return {label:c.label,data:r.hist.map((y,x)=>({x,y})),borderColor:c.color,backgroundColor:c.color,pointRadius:0,borderWidth:2.5,tension:.05};});
-  const o=baseOpts(true);
-  o.scales.x.title={display:true,text:'Iteracja',color:TICK};
-  o.scales.y.title={display:true,text:'Residuum względne',color:TICK};
-  new Chart(document.getElementById('residualChart'),{type:'line',data:{datasets},options:o});
+  const cfgs=[{p:50,th:0.60,seed:2,label:'ρ≈0.43 — szybka',color:C_CLASSIC},
+              {p:50,th:0.72,seed:3,label:'ρ≈0.85 — średnia',color:'#3ddaa0'},
+              {p:50,th:0.78,seed:4,label:'ρ≈0.98 — wolna',color:C_BLOCK}];
+  const ser=cfgs.map(c=>{const P=buildProblem(c.p,c.th,c.seed);return {...c,hist:classicGS(P,1e-10,2000).hist};});
+  const xmax=Math.max(...ser.map(s=>s.hist.length-1),50);
+  const lo=-11,hi=0;
+  let g=gridYlog(lo,hi,1);
+  [0,200,400,600,800].forEach(t=>{if(t<=xmax){const x=xLin(t,0,xmax);g+=`<line x1="${x}" y1="${PY0}" x2="${x}" y2="${PY0+4}" stroke="${AX}"/>`+`<text x="${x}" y="${PY0+22}" fill="${LBL}" font-size="13" text-anchor="middle">${t}</text>`;}});
+  ser.forEach(s=>{const pts=s.hist.map((v,i)=>`${xLin(i,0,xmax).toFixed(1)},${yLog(v,lo,hi).toFixed(1)}`).join(' ');
+    g+=`<polyline points="${pts}" fill="none" stroke="${s.color}" stroke-width="2.6"/>`;});
+  g+=axes('Iteracja','Residuum względne')+legend(ser.map(s=>({label:s.label,color:s.color})));
+  document.getElementById('residualChart').innerHTML=SVG(g);
 }
 function buildIterChart(){
-  const pts=TESTS.map(t=>({x:t.rho,y:t.ci,conv:t.cc}));
-  const conv=pts.filter(p=>p.conv),div=pts.filter(p=>!p.conv);
-  const o=baseOpts(false);o.scales.x.type='logarithmic';o.scales.y.type='logarithmic';
-  o.scales.x.title={display:true,text:'ρ = max|sᵢ/cᵢ|²  (skala log)',color:TICK};
-  o.scales.y.title={display:true,text:'Liczba iteracji (skala log)',color:TICK};
-  new Chart(document.getElementById('iterChart'),{type:'scatter',
-    data:{datasets:[{label:'Zbieżne',data:conv,backgroundColor:C_CLASSIC,pointRadius:9},
-      {label:'Rozbieżne / zatrzymane',data:div,backgroundColor:'#ff6170',pointStyle:'crossRot',pointRadius:11,borderWidth:3,borderColor:'#ff6170'}]},options:o});
+  const lox=-2,hix=16,loy=0,hiy=4;
+  let g='';
+  for(let e=loy;e<=hiy;e++){const y=yLog(Math.pow(10,e),loy,hiy);g+=`<line x1="${PX0}" y1="${y}" x2="${PX1}" y2="${y}" stroke="${GC}"/>`+pow(PX0-10,y,e);}
+  for(let e=lox;e<=hix;e+=2){const x=xLog(Math.pow(10,e),lox,hix);g+=`<line x1="${x}" y1="${PY1}" x2="${x}" y2="${PY0}" stroke="rgba(255,255,255,.05)"/>`+`<text x="${x}" y="${PY0+22}" fill="${LBL}" font-size="12" text-anchor="middle">10<tspan dy="-6" font-size="9">${e}</tspan></text>`;}
+  const xv=xLog(1,lox,hix);g+=`<line x1="${xv}" y1="${PY1}" x2="${xv}" y2="${PY0}" stroke="#e23a5e" stroke-width="1.5" stroke-dasharray="6 5"/>`+`<text x="${xv+6}" y="${PY1+16}" fill="#e23a5e" font-size="13">ρ=1</text>`;
+  TESTS.forEach(t=>{const x=xLog(t.rho,lox,hix),y=yLog(t.ci,loy,hiy);
+    g+= t.cc ? `<circle cx="${x}" cy="${y}" r="8" fill="none" stroke="${C_CLASSIC}" stroke-width="2.6"/>`
+             : `<path d="M${x-7},${y-7} L${x+7},${y+7} M${x-7},${y+7} L${x+7},${y-7}" stroke="#ff6170" stroke-width="3"/>`;});
+  g+=axes('ρ = max|sᵢ/cᵢ|²  (log)','Liczba iteracji (log)')+legend([{label:'Zbieżne',color:C_CLASSIC},{label:'Rozbieżne / zatrzymane',color:'#ff6170'}]);
+  document.getElementById('iterChart').innerHTML=SVG(g);
 }
+function catX(i,n){return PX0+(PX1-PX0)*((i+0.5)/n);}
 function buildErrChart(){
-  const labels=TESTS.map(t=>'T'+t.id);
-  const o=baseOpts(true);o.scales.y.title={display:true,text:'Błąd względny (log)',color:TICK};
-  new Chart(document.getElementById('errChart'),{type:'line',data:{labels,datasets:[
-    {label:'Klasyczny GS',data:TESTS.map(t=>t.ce),borderColor:C_CLASSIC,backgroundColor:C_CLASSIC,borderWidth:3,pointRadius:5,tension:.1},
-    {label:'Blokowy GS 2×2',data:TESTS.map(t=>t.be),borderColor:C_BLOCK,backgroundColor:C_BLOCK,borderWidth:3,pointRadius:5,tension:.1}]},options:o});
+  const lo=-17,hi=16,n=TESTS.length;
+  let g='';
+  for(let e=lo;e<=hi;e+=3){const y=yLog(Math.pow(10,e),lo,hi);g+=`<line x1="${PX0}" y1="${y}" x2="${PX1}" y2="${y}" stroke="${GC}"/>`+pow(PX0-10,y,e);}
+  TESTS.forEach((t,i)=>{const x=catX(i,n);g+=`<text x="${x}" y="${PY0+22}" fill="${LBL}" font-size="12" text-anchor="middle">T${t.id}</text>`;});
+  const pc=TESTS.map((t,i)=>`${catX(i,n).toFixed(1)},${yLog(t.ce,lo,hi).toFixed(1)}`).join(' ');
+  const pb=TESTS.map((t,i)=>`${catX(i,n).toFixed(1)},${yLog(t.be,lo,hi).toFixed(1)}`).join(' ');
+  g+=`<polyline points="${pc}" fill="none" stroke="${C_CLASSIC}" stroke-width="3"/>`+`<polyline points="${pb}" fill="none" stroke="${C_BLOCK}" stroke-width="3"/>`;
+  TESTS.forEach((t,i)=>{const x=catX(i,n);g+=`<circle cx="${x}" cy="${yLog(t.ce,lo,hi)}" r="4.5" fill="${C_CLASSIC}"/>`+`<circle cx="${x}" cy="${yLog(t.be,lo,hi)}" r="4.5" fill="${C_BLOCK}"/>`;});
+  g+=axes('Numer testu','Błąd względny (log)')+legend([{label:'Klasyczny GS',color:C_CLASSIC},{label:'Blokowy GS 2×2',color:C_BLOCK}]);
+  document.getElementById('errChart').innerHTML=SVG(g);
 }
 function buildTimeChart(){
-  const labels=TESTS.map(t=>'T'+t.id);
-  const o=baseOpts(true);o.scales.y.title={display:true,text:'Czas [ms] (skala log)',color:TICK};
-  new Chart(document.getElementById('timeChart'),{type:'bar',data:{labels,datasets:[
-    {label:'Klasyczny GS',data:TESTS.map(t=>t.ct),backgroundColor:C_CLASSIC},
-    {label:'Blokowy GS 2×2',data:TESTS.map(t=>t.bt),backgroundColor:C_BLOCK}]},options:o});
+  const lo=-2,hi=2,n=TESTS.length;
+  let g='';
+  for(let e=lo;e<=hi;e++){const y=yLog(Math.pow(10,e),lo,hi);g+=`<line x1="${PX0}" y1="${y}" x2="${PX1}" y2="${y}" stroke="${GC}"/>`+pow(PX0-10,y,e);}
+  const gw=(PX1-PX0)/n, bw=gw*0.30;
+  TESTS.forEach((t,i)=>{const xc=PX0+gw*(i+0.5);
+    const yc=yLog(t.ct,lo,hi); g+=`<rect x="${xc-bw-2}" y="${yc}" width="${bw}" height="${PY0-yc}" fill="${C_CLASSIC}"/>`;
+    const yb=yLog(t.bt,lo,hi); g+=`<rect x="${xc+2}" y="${yb}" width="${bw}" height="${PY0-yb}" fill="${C_BLOCK}"/>`;
+    g+=`<text x="${xc}" y="${PY0+22}" fill="${LBL}" font-size="12" text-anchor="middle">T${t.id}</text>`;});
+  g+=axes('Numer testu','Czas [ms] (log)')+legend([{label:'Klasyczny GS',color:C_CLASSIC},{label:'Blokowy GS 2×2',color:C_BLOCK}]);
+  document.getElementById('timeChart').innerHTML=SVG(g);
 }
 
 /* ===== START ===== */
